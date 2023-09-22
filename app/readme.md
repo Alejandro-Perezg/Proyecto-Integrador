@@ -12,19 +12,19 @@ The requeriments for this are listed bellow:
 
 # Usage
 
-- Mac/Unix: `python3 MyFirstFlaskApp.py`
-- Windows: `python MyFirstFlaskApp.py`
+- Mac/Unix: `python3 app.py`
+- Windows: `python app.py`
 
 # Virtual environment
 
 ## To create the virtual environment
 
 - For mac/unix users: `python3 -m venv env`
-- For windows users: `py -m venv env`
+- For windows users: `py -m venv win-env`
 
 ## After creating the environment, activate ir by running
 - For mac/unix users: `source env/bin/activate`
-- For windows users: `.\env\Scripts\activate`
+- For windows users: `.\win-env\Scripts\activate`
 
 ## You can deactivate it by simply running the command below, but you don't have to deactivate it yet.
 `deactivate`
