@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\JL Mata\Documents\GitHub\Proyecto-Integrador\app\win-env"
+VIRTUAL_ENV="C:\Users\OMEN\Documents\Ultimo semestre\proyectointegrador\Proyecto-Integrador\app\win-env"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
