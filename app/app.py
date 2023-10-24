@@ -1,4 +1,5 @@
 from flask import Flask, request, render_template, redirect
+import re
 
 import firebase_admin
 from firebase_admin import credentials
@@ -28,6 +29,7 @@ def home():
 
 @app.route('/register', methods = ['GET', 'POST'])
 def register():
+    #Si el metodo llamado es Post se guardan los datos del formulario y se validan
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -35,22 +37,38 @@ def register():
         correoElectronico = request.form['correoElectronico']
         fechaNacimiento = request.form['fechaNacimiento']
         club = request.form['club']
-        if password == repetirPassword:
+        if (password != repetirPassword):
+            message = "¡La contraseña no concide con la confirmación de contraseña!"
+            return render_template('registro.html', message=message)
+        elif (password == "" or repetirPassword == "" or username == ""):
+            message = "Tienes que llenar todos los campos"
+            return render_template('registro.html', message=message)
+        elif validar_correo(correoElectronico) == False:
+            message = "El correo electronico no es válido."
+            return render_template('registro.html', message=message)
+        else:
             data = {
             'username': username,
             'password': password,
             'correoElectronico': correoElectronico,
             'fechaNacimiento': fechaNacimiento,
-            'club': club
+            'club': club,
+            'rol': 'socio'
             }
-            doc_ref = db.collection('Users').document()
-            doc_ref.set(data)
-            return redirect('/')
-        else: 
-            print("La contraseña no concide con la confirmación de contraseña")
-            return redirect('/register')
+            if usuario_existente("Users", username, correoElectronico) == "El usuario no existe":
+                doc_ref = db.collection('Users').document()
+                doc_ref.set(data)
+                return redirect('/')
+            elif usuario_existente("Users", username, correoElectronico) == "El nombre de usuario o correo electronico no estan disponibles":
+                message = "El nombre de usuario o correo electronico no estan disponibles"
+                return render_template('registro.html', message = message)
+            else:
+                message = "Hubo un problema con el registrop"
+                return render_template('registro.html', message = message)
+
     else:
-        return render_template('registro.html')
+        message = ""
+        return render_template('registro.html', message=message)
     
 
 def getDocumentsForLogin(collection_name, username, password):
@@ -70,6 +88,35 @@ def getDocumentsForLogin(collection_name, username, password):
                 return(user)
         except:
             return "Hubo un problema iniciando sesión"
+
+def validar_correo(correo):
+    # Define una expresión regular para validar correos electrónicos
+    patron = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    
+    # Intenta hacer coincidir el patrón con el correo proporcionado
+    if re.match(patron, correo):
+        return True
+    else:
+        return False
+    
+
+def usuario_existente(collectionName, username, coreoElectronico):
+    try:
+        doc_ref = db.collection(collectionName)
+        #Filtros para el query
+        filter_username = FieldFilter("username", "==", username)
+        filter_email = FieldFilter("correoElectronico", "==", coreoElectronico)
+        and_filter = Or(filters=[filter_username, filter_email])
+
+        #Query con los filtros, este query busca si hay un usuario con el usuario y la contraseña especificado
+        docs = doc_ref.where(filter=and_filter).get()
+        if not docs:
+            return "El usuario no existe"
+        else:
+            return "El nombre de usuario o correo electronico no estan disponibles"
+    except:
+        return "Hubo un problema con el registro"
+
 
 
             
