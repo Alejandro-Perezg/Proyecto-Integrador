@@ -19,13 +19,33 @@ def hello():
         password = request.form['password']
         data = getDocumentsForLogin("Users", username, password)
         print(data)
-        return redirect('/home')
+        if data == "Las credenciales ingresadas son incorrectas":
+            message = "Las credenciales ingresadas son incorrectas"
+            return render_template('inicio_sesion.html', message = message)
+        
+        elif data == "Hubo un problema iniciando sesión":
+            message = "Hubo un problema iniciando sesión"
+            return render_template('inicio_sesion.html', message = message)
+        else:
+            rol = data["rol"]
+            usuario = data["username"]
+            return redirect(f'/home/{usuario}/{rol}')
     else:
         return render_template('inicio_sesion.html')
     
-@app.route('/home')
-def home():
-    return f'Welcome Home'
+@app.route('/home/<string:usuario>/<string:rol>')
+def home(usuario, rol):
+    if rol == "socio":
+        print(usuario, rol)
+        return render_template('menu_inicio.html')
+    elif rol == "administrador":
+        Usuario = usuario
+        return render_template('menu_inicio_administracion.html', Usuario=Usuario)
+    else:
+        Usuario = usuario
+        return render_template('menu_inicio_propietario.html', Usuario=Usuario)
+
+
 
 @app.route('/register', methods = ['GET', 'POST'])
 def register():
@@ -36,16 +56,20 @@ def register():
         repetirPassword = request.form['repetirPassword']
         correoElectronico = request.form['correoElectronico']
         fechaNacimiento = request.form['fechaNacimiento']
-        club = request.form['club']
+        club = request.form.get('club')
+
         if (password != repetirPassword):
             message = "¡La contraseña no concide con la confirmación de contraseña!"
             return render_template('registro.html', message=message)
+        
         elif (password == "" or repetirPassword == "" or username == ""):
             message = "Tienes que llenar todos los campos"
             return render_template('registro.html', message=message)
+        
         elif validar_correo(correoElectronico) == False:
             message = "El correo electronico no es válido."
             return render_template('registro.html', message=message)
+        
         else:
             data = {
             'username': username,
@@ -116,10 +140,10 @@ def usuario_existente(collectionName, username, coreoElectronico):
             return "El nombre de usuario o correo electronico no estan disponibles"
     except:
         return "Hubo un problema con el registro"
+    
 
 
 
-            
         
 
 
