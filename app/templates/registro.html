@@ -39,14 +39,12 @@
       <input type="text" name="password" id="password" style="width: 311px; height: 44px; left: 41px; top: 283px; position: absolute; background: #D9D9D9; border-radius: 15px">
       <input type="text" name="repetirPassword" id="repetirPassword" style="width: 311px; height: 44px; left: 40px; top: 401px; position: absolute; background: #D9D9D9; border-radius: 15px">
       <input type="text" name="correoElectronico" id="correoElectronico" style="width: 311px; height: 44px; left: 40px; top: 519px; position: absolute; background: #D9D9D9; border-radius: 15px">
-      <input type="text" name="fechaNacimiento" id="fechaNacimiento" style="width: 311px; height: 44px; left: 39px; top: 637px; position: absolute; background: #D9D9D9; border-radius: 15px">
+      <input type="date" name="fechaNacimiento" id="fechaNacimiento" style="width: 311px; height: 44px; left: 39px; top: 637px; position: absolute; background: #D9D9D9; border-radius: 15px">
       <!--<input type="text" name="club" id="club" style="width: 311px; height: 44px; left: 41px; top: 755px; position: absolute; background: #D9D9D9; border-radius: 15px">-->
-      <label for="club">País:</label>
       <select id="club" name="club" style="width: 311px; height: 44px; left: 41px; top: 755px; position: absolute; background: #D9D9D9; border-radius: 15px">
-          <option value="mexico">México</option>
-          <option value="espana">España</option>
-          <option value="argentina">Argentina</option>
-          <option value="colombia">Colombia</option>
+        {% for club in clubes %}
+          <option value="{{club}}">{{club}}</option>
+        {% endfor %}
       </select>
       <input type="submit" value="Registrarse" style="width: 311px; height: 44px; left: 41px; top: 866px; position: absolute; background: #33C9F8; border-radius: 30px; font-size: 25px; font-family: Inter; font-weight: 400; word-wrap: break-word">
   </form>

@@ -44,6 +44,10 @@ def home(usuario, rol):
     else:
         Usuario = usuario
         return render_template('menu_inicio_propietario.html', Usuario=Usuario)
+    
+@app.route('/administracion')
+def administracion():
+    return render_template('clubes_admin.html')
 
 
 
@@ -92,7 +96,9 @@ def register():
 
     else:
         message = ""
-        return render_template('registro.html', message=message)
+        clubes = get_documentos("Clubes")
+        print(clubes)
+        return render_template('registro.html', message=message, clubes = clubes)
     
 
 def getDocumentsForLogin(collection_name, username, password):
@@ -122,6 +128,20 @@ def validar_correo(correo):
         return True
     else:
         return False
+    
+def get_documentos(collection_name):
+    docs = (
+        db.collection(collection_name).get()
+            )
+    lista_clubes = []
+    for doc in docs:
+        club = doc.get("club")
+        lista_clubes.append(club)
+
+    print(lista_clubes)
+    return lista_clubes
+
+    
     
 
 def usuario_existente(collectionName, username, coreoElectronico):
