@@ -45,9 +45,18 @@ def home(usuario, rol):
         Usuario = usuario
         return render_template('menu_inicio_propietario.html', Usuario=Usuario)
     
+
+    
 @app.route('/administracion')
 def administracion():
     return render_template('clubes_admin.html')
+
+
+@app.route('/crear_club')
+def crear_club():
+    admins = get_admins("Users")
+    usuarios = get_documentos("Users", "username")
+    return render_template('crear_club.html', administradores = admins, usuarios = usuarios)
 
 
 
@@ -84,7 +93,7 @@ def register():
             'rol': 'socio'
             }
             if usuario_existente("Users", username, correoElectronico) == "El usuario no existe":
-                doc_ref = db.collection('Users').document()
+                doc_ref = db.collection('Users').document(username)
                 doc_ref.set(data)
                 return redirect('/')
             elif usuario_existente("Users", username, correoElectronico) == "El nombre de usuario o correo electronico no estan disponibles":
@@ -96,7 +105,7 @@ def register():
 
     else:
         message = ""
-        clubes = get_documentos("Clubes")
+        clubes = get_documentos("Clubes", "club")
         print(clubes)
         return render_template('registro.html', message=message, clubes = clubes)
     
@@ -129,21 +138,20 @@ def validar_correo(correo):
     else:
         return False
     
-def get_documentos(collection_name):
+def get_documentos(collection_name, value):
     docs = (
         db.collection(collection_name).get()
             )
     lista_clubes = []
     for doc in docs:
-        club = doc.get("club")
+        club = doc.get(value)
         lista_clubes.append(club)
 
     print(lista_clubes)
     return lista_clubes
-
+ 
     
-    
-
+#Funcion que verifica si el usario registrado existe
 def usuario_existente(collectionName, username, coreoElectronico):
     try:
         doc_ref = db.collection(collectionName)
@@ -162,9 +170,20 @@ def usuario_existente(collectionName, username, coreoElectronico):
         return "Hubo un problema con el registro"
     
 
+#funcion que trae los usuarios que tienen el rol de administrador
+def get_admins(collection_name):
+    doc_ref = db.collection(collection_name)
+    filter_admin = FieldFilter("rol", "==", "administrador")
+    docs = doc_ref.where(filter = filter_admin).get()
+    admin_list = []
+    for doc in docs:
+        admin = doc.get("username")
+        admin_list.append(admin)
+    return admin_list
 
 
-        
+
+    
 
 
 
