@@ -21,7 +21,6 @@ def login():
         
         session['username'] = username
         data = getDocumentsForLogin("Users", username, password)
-        print(data)
         if data == "Las credenciales ingresadas son incorrectas":
             message = "Las credenciales ingresadas son incorrectas"
             return render_template('inicio_sesion.html', message = message)
@@ -35,6 +34,7 @@ def login():
             return redirect(f'/home/{usuario}/{rol}')
     else:
         return render_template('inicio_sesion.html')
+
     
     
 @app.route('/home/<string:usuario>/<string:rol>')
@@ -52,6 +52,25 @@ def home(usuario, rol):
     else:
         return redirect(url_for('login'))
     
+@app.route('/sesiones_activas')
+def sesiones_activas():
+    return render_template("sesiones_activas.html")
+
+@app.route('/informacion_personal')
+def informacion_personal():
+    return render_template("informacion_personal.html")
+
+@app.route('/clubes')
+def clubes():
+    return render_template("clubes.html")
+
+@app.route('/noticias')
+def noticias():
+    return render_template("noticias.html")
+
+@app.route('/aviso_de_privacidad')
+def aviso_de_privacidad():
+    return render_template("aviso_privacidad.html")
 
     
 @app.route('/administracion')
@@ -124,7 +143,7 @@ def register():
                 message = "El nombre de usuario o correo electronico no estan disponibles"
                 return render_template('registro.html', message = message)
             else:
-                message = "Hubo un problema con el registrop"
+                message = "Hubo un problema con el registro"
                 return render_template('registro.html', message = message)
 
     else:
