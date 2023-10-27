@@ -51,12 +51,29 @@ def home(usuario, rol):
 def administracion():
     return render_template('clubes_admin.html')
 
-
-@app.route('/crear_club')
+#Crear club
+@app.route('/crear_club', methods = ['GET', 'POST'])
 def crear_club():
-    admins = get_admins("Users")
-    usuarios = get_documentos("Users", "username")
-    return render_template('crear_club.html', administradores = admins, usuarios = usuarios)
+    if request.method == 'POST':
+        club = request.form['nombre_club']
+        admin = request.form['administradores']
+        usuarios_club = request.form.getlist('miembros')
+        if club == "":
+            message = "Tienes que ponerle un nombre al club"
+            admins = get_admins("Users")
+            usuarios = get_documentos("Users", "username")
+            return render_template("/crear_club.html", administradores = admins, usuarios = usuarios, message= message)
+        else:
+            crear_club("Clubes", club, usuarios_club, admin)
+            admins = get_admins("Users")
+            usuarios = get_documentos("Users", "username")
+            message = "El club se ha creado correctamente"
+            return render_template("crear_club.html", administradores = admins, usuarios = usuarios, message= message)
+    else:
+       admins = get_admins("Users")
+       usuarios = get_documentos("Users", "username")
+       message = ""
+       return render_template('crear_club.html', administradores = admins, usuarios = usuarios, message = message)
 
 
 
@@ -137,7 +154,7 @@ def validar_correo(correo):
         return True
     else:
         return False
-    
+#Funcion que trae un valor específico de los documentos de una colección
 def get_documentos(collection_name, value):
     docs = (
         db.collection(collection_name).get()
@@ -182,9 +199,17 @@ def get_admins(collection_name):
     return admin_list
 
 
-
+def crear_club(collection_name, nombre, usuarios, admin):
+    data = {"club":nombre}
+    doc_ref = db.collection(collection_name).document(nombre)
+    doc_ref.set(data)
+    collecion_usuarios_club = db.collection(collection_name).document(nombre).collection("Users")
+    collecion_usuarios_club.add({"administrador": admin})
+    for usuario in usuarios:
+        collecion_usuarios_club.add({
+            "username":usuario
+        })
     
-
 
 
 if __name__ == "__main__":
