@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios y Clubes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title {
+            font-size: 24px;
+        }
+
+        .add-button {
+            background-color: #0099FF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: #fff;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            background-color: #007BFF;
+            color: #fff;
+        }
+
+        .user-list {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .user {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px;
+            flex: 0 0 calc(33.33% - 20px);
+            position: relative;
+        }
+
+        .user-name {
+            font-weight: bold;
+        }
+
+        .edit-icon {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            color: #007BFF;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .user {
+                flex: 0 0 calc(50% - 20px);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .user {
+                flex: 0 0 calc(100% - 20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="title">Usuarios y Clubes</div>
+        <button class="add-button">+</button>
+    </div>
+    <div class="tabs">
+        <div class="tab active">Usuarios</div>
+        <div class="tab">Clubes</div>
+    </div>
+    <div class="user-list">
+        <div class="user">
+            <div class="user-name">Carlos</div>
+            <i class="edit-icon">✏️</i>
+        </div>
+        <div class="user">
+            <div class="user-name">Roberto</div>
+            <i class="edit-icon">✏️</i>
+        </div>
+        <div class="user">
+            <div class="user-name">Bruno</div>
+            <i class="edit-icon">✏️</i>
+        </div>
+        <!-- Agrega más usuarios aquí -->
+    </div>
+</body>
+</html>

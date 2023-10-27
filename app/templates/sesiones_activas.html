@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sesiones</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .session {
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .session-title {
+            font-weight: bold;
+        }
+
+        .session-date {
+            color: #555;
+        }
+
+        .view-button {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .session {
+                flex-direction: column;
+            }
+
+            .view-button {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sesiones</h1>
+        <div class="session">
+            <div>
+                <p class="session-title">Sesión 1: Título de la Sesión</p>
+                <p class="session-date">Fecha: 25 de Octubre de 2023</p>
+            </div>
+            <button class="view-button">Ver</button>
+        </div>
+        <div class="session">
+            <div>
+                <p class="session-title">Sesión 2: Título de la Sesión</p>
+                <p class="session-date">Fecha: 30 de Octubre de 2023</p>
+            </div>
+            <button class="view-button">Ver</button>
+        </div>
+        <div class="session">
+            <div>
+                <p class="session-title">Sesión 3: Título de la Sesión</p>
+                <p class="session-date">Fecha: 5 de Noviembre de 2023</p>
+            </div>
+            <button class="view-button">Ver</button>
+        </div>
+    </div>
+</body>
+</html>
