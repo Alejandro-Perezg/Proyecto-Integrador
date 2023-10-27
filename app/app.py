@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, session, url_for
 import re
 
 import firebase_admin
@@ -10,13 +10,16 @@ cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 
 app = Flask(__name__)
+app.secret_key = '76bfc11478402f680540614ce08e8f76'
 db = firestore.client()
 
 @app.route('/', methods = ['GET', 'POST'])
-def hello():
+def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        
+        session['username'] = username
         data = getDocumentsForLogin("Users", username, password)
         print(data)
         if data == "Las credenciales ingresadas son incorrectas":
@@ -33,17 +36,21 @@ def hello():
     else:
         return render_template('inicio_sesion.html')
     
+    
 @app.route('/home/<string:usuario>/<string:rol>')
 def home(usuario, rol):
-    if rol == "socio":
-        print(usuario, rol)
-        return render_template('menu_inicio.html')
-    elif rol == "administrador":
-        Usuario = usuario
-        return render_template('menu_inicio_administracion.html', Usuario=Usuario)
+    if 'username' in session:
+        if rol == "socio":
+            print(usuario, rol)
+            return render_template('menu_inicio.html')
+        elif rol == "administrador":
+            Usuario = usuario
+            return render_template('menu_inicio_administracion.html', Usuario=Usuario)
+        else:
+            Usuario = usuario
+            return render_template('menu_inicio_propietario.html', Usuario=Usuario)
     else:
-        Usuario = usuario
-        return render_template('menu_inicio_propietario.html', Usuario=Usuario)
+        return redirect(url_for('login'))
     
 
     
