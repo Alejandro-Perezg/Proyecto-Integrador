@@ -1,21 +1,135 @@
-<div style="width: 393px; height: 1266px; position: relative; background: white">
-    <div style="width: 278px; height: 49px; left: 19px; top: 28px; position: absolute; text-align: center; color: black; font-size: 30px; font-family: Inter; font-weight: 400; word-wrap: break-word">Titulo de la sesión</div>
-    <div style="width: 120px; height: 47px; left: 38px; top: 111px; position: absolute; text-align: center; color: black; font-size: 30px; font-family: Inter; font-weight: 400; word-wrap: break-word">Fecha</div>
-    <div style="width: 301px; height: 47px; left: 24px; top: 273px; position: absolute; text-align: center; color: black; font-size: 30px; font-family: Inter; font-weight: 400; word-wrap: break-word">Numero de sesión </div>
-    <div style="width: 120px; height: 47px; left: 24px; top: 192px; position: absolute; text-align: center; color: black; font-size: 30px; font-family: Inter; font-weight: 400; word-wrap: break-word">Hora</div>
-    <div style="width: 259px; height: 47px; left: 46px; top: 431px; position: absolute; color: black; font-size: 30px; font-family: Inter; font-weight: 400; word-wrap: break-word">Tema de sesión</div>
-    <div style="width: 259px; height: 47px; left: 46px; top: 699px; position: absolute; color: black; font-size: 30px; font-family: Inter; font-weight: 400; word-wrap: break-word">Definicion y ejemplo</div>
-    <div style="width: 259px; height: 47px; left: 46px; top: 814px; position: absolute; color: black; font-size: 30px; font-family: Inter; font-weight: 400; word-wrap: break-word">Invitación</div>
-    <div style="width: 259px; height: 47px; left: 46px; top: 623px; position: absolute; color: black; font-size: 30px; font-family: Inter; font-weight: 400; word-wrap: break-word">Tema de sesión</div>
-    <div style="width: 259px; height: 47px; left: 46px; top: 508px; position: absolute; color: black; font-size: 30px; font-family: Inter; font-weight: 400; word-wrap: break-word">Palabra de la sesión</div>
-    <div style="width: 120px; height: 47px; left: 38px; top: 355px; position: absolute; text-align: center; color: black; font-size: 30px; font-family: Inter; font-weight: 400; word-wrap: break-word">Acceso</div>
-    <div style="width: 297px; height: 62px; left: 46px; top: 901px; position: absolute; background: #33C9F8; border-radius: 30px"></div>
-    <div style="width: 297px; height: 62px; left: 46px; top: 998px; position: absolute; background: #D9D9D9; border-radius: 30px"></div>
-    <div style="width: 30px; height: 30px; left: 290px; top: 1014px; position: absolute">
-      <div style="width: 7.50px; height: 15px; left: 22.50px; top: 18.75px; position: absolute; transform: rotate(-90deg); transform-origin: 0 0; border: 2px #33363F solid"></div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda de Sesión</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .session-info {
+            margin: 10px 0;
+        }
+
+        .session-info label {
+            font-weight: bold;
+        }
+
+        .session-info p {
+            margin: 5px 0;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            cursor: pointer;
+            margin: 10px auto;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            display: block;
+        }
+
+        select {
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            button {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Agenda de Sesión</h1>
+        <div class="session-info">
+            <label>Título de la Sesión:</label>
+            <p>Información del título de la sesión</p>
+        </div>
+
+        <div class="session-info">
+            <label>Fecha:</label>
+            <p>Información de la fecha</p>
+        </div>
+
+        <div class="session-info">
+            <label>Hora:</label>
+            <p>Información de la hora</p>
+        </div>
+
+        <div class="session-info">
+            <label>Número de Sesión:</label>
+            <p>Información del número de sesión</p>
+        </div>
+
+        <div class "session-info">
+            <label>Acceso:</label>
+            <p>Información del acceso</p>
+        </div>
+
+        <div class="session-info">
+            <label>Tema de Sesión:</label>
+            <p>Información del tema de sesión</p>
+        </div>
+
+        <div class="session-info">
+            <label>Palabra de la Sesión:</label>
+            <p>Información de la palabra de la sesión</p>
+        </div>
+
+        <div class="session-info">
+            <label>Definición y Ejemplo:</label>
+            <p>Información de la definición y ejemplo</p>
+        </div>
+
+        <div class="session-info">
+            <label>Invitación:</label>
+            <p>Información de la invitación</p>
+        </div>
+
+        <div class="session-info">
+            <label>Rol:</label>
+            <select>
+                <option value="anfitrión">Anfitrión</option>
+                <option value="invitado">Invitado</option>
+                <option value="observador">Observador</option>
+            </select>
+        </div>
+
+        <button>Participar</button>
     </div>
-    <div style="width: 180px; height: 34px; left: 98px; top: 915px; position: absolute; text-align: center; color: white; font-size: 30px; font-family: Inter; font-weight: 400; word-wrap: break-word">Participar</div>
-    <div style="width: 297px; height: 62px; left: 48px; top: 1095px; position: absolute; background: #99E493; border-radius: 30px"></div>
-    <div style="width: 180px; height: 34px; left: 100px; top: 1109px; position: absolute; text-align: center; color: white; font-size: 30px; font-family: Inter; font-weight: 400; word-wrap: break-word">Guardar</div>
-    <div style="width: 113px; height: 35px; left: 84px; top: 1009px; position: absolute; color: black; font-size: 30px; font-family: Inter; font-weight: 400; word-wrap: break-word">Rol</div>
-  </div>
+</body>
+</html>
