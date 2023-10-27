@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, session, url_for
 import re
 
 import firebase_admin
@@ -10,13 +10,16 @@ cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 
 app = Flask(__name__)
+app.secret_key = '76bfc11478402f680540614ce08e8f76'
 db = firestore.client()
 
 @app.route('/', methods = ['GET', 'POST'])
-def hello():
+def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        
+        session['username'] = username
         data = getDocumentsForLogin("Users", username, password)
         print(data)
         if data == "Las credenciales ingresadas son incorrectas":
@@ -32,22 +35,72 @@ def hello():
             return redirect(f'/home/{usuario}/{rol}')
     else:
         return render_template('inicio_sesion.html')
+
+    
     
 @app.route('/home/<string:usuario>/<string:rol>')
 def home(usuario, rol):
-    if rol == "socio":
-        print(usuario, rol)
-        return render_template('menu_inicio.html')
-    elif rol == "administrador":
-        Usuario = usuario
-        return render_template('menu_inicio_administracion.html', Usuario=Usuario)
+    if 'username' in session:
+        if rol == "socio":
+            print(usuario, rol)
+            return render_template('menu_inicio.html')
+        elif rol == "administrador":
+            Usuario = usuario
+            return render_template('menu_inicio_administracion.html', Usuario=Usuario)
+        else:
+            Usuario = usuario
+            return render_template('menu_inicio_propietario.html', Usuario=Usuario)
     else:
-        Usuario = usuario
-        return render_template('menu_inicio_propietario.html', Usuario=Usuario)
+        return redirect(url_for('login'))
+    
+@app.route('/sesiones_activas')
+def sesiones_activas():
+    return render_template("sesiones_activas.html")
+
+@app.route('/informacion_personal')
+def informacion_personal():
+    return render_template("informacion_personal.html")
+
+@app.route('/clubes')
+def clubes():
+    return render_template("clubes.html")
+
+@app.route('/noticias')
+def noticias():
+    return render_template("noticias.html")
+
+@app.route('/aviso_de_privacidad')
+def aviso_de_privacidad():
+    return render_template("aviso_privacidad.html")
+
     
 @app.route('/administracion')
 def administracion():
     return render_template('clubes_admin.html')
+
+#Crear club
+@app.route('/crear_club', methods = ['GET', 'POST'])
+def crear_club():
+    if request.method == 'POST':
+        club = request.form['nombre_club']
+        admin = request.form['administradores']
+        usuarios_club = request.form.getlist('miembros')
+        if club == "":
+            message = "Tienes que ponerle un nombre al club"
+            admins = get_admins("Users")
+            usuarios = get_documentos("Users", "username")
+            return render_template("/crear_club.html", administradores = admins, usuarios = usuarios, message= message)
+        else:
+            crear_club("Clubes", club, usuarios_club, admin)
+            admins = get_admins("Users")
+            usuarios = get_documentos("Users", "username")
+            message = "El club se ha creado correctamente"
+            return render_template("crear_club.html", administradores = admins, usuarios = usuarios, message= message)
+    else:
+       admins = get_admins("Users")
+       usuarios = get_documentos("Users", "username")
+       message = ""
+       return render_template('crear_club.html', administradores = admins, usuarios = usuarios, message = message)
 
 
 
@@ -84,21 +137,24 @@ def register():
             'rol': 'socio'
             }
             if usuario_existente("Users", username, correoElectronico) == "El usuario no existe":
-                doc_ref = db.collection('Users').document()
+                doc_ref = db.collection('Users').document(username)
                 doc_ref.set(data)
                 return redirect('/')
             elif usuario_existente("Users", username, correoElectronico) == "El nombre de usuario o correo electronico no estan disponibles":
                 message = "El nombre de usuario o correo electronico no estan disponibles"
                 return render_template('registro.html', message = message)
             else:
-                message = "Hubo un problema con el registrop"
+                message = "Hubo un problema con el registro"
                 return render_template('registro.html', message = message)
 
     else:
         message = ""
-        clubes = get_documentos("Clubes")
+        clubes = get_documentos("Clubes", "club")
         print(clubes)
         return render_template('registro.html', message=message, clubes = clubes)
+    
+
+@app.route('/info', methods = ['GET', 'POST'])
     
 
 def getDocumentsForLogin(collection_name, username, password):
@@ -128,22 +184,21 @@ def validar_correo(correo):
         return True
     else:
         return False
-    
-def get_documentos(collection_name):
+#Funcion que trae un valor específico de los documentos de una colección
+def get_documentos(collection_name, value):
     docs = (
         db.collection(collection_name).get()
             )
     lista_clubes = []
     for doc in docs:
-        club = doc.get("club")
+        club = doc.get(value)
         lista_clubes.append(club)
 
     print(lista_clubes)
     return lista_clubes
-
+ 
     
-    
-
+#Funcion que verifica si el usario registrado existe
 def usuario_existente(collectionName, username, coreoElectronico):
     try:
         doc_ref = db.collection(collectionName)
@@ -162,10 +217,29 @@ def usuario_existente(collectionName, username, coreoElectronico):
         return "Hubo un problema con el registro"
     
 
+#funcion que trae los usuarios que tienen el rol de administrador
+def get_admins(collection_name):
+    doc_ref = db.collection(collection_name)
+    filter_admin = FieldFilter("rol", "==", "administrador")
+    docs = doc_ref.where(filter = filter_admin).get()
+    admin_list = []
+    for doc in docs:
+        admin = doc.get("username")
+        admin_list.append(admin)
+    return admin_list
 
 
-        
-
+def crear_club(collection_name, nombre, usuarios, admin):
+    data = {"club":nombre}
+    doc_ref = db.collection(collection_name).document(nombre)
+    doc_ref.set(data)
+    collecion_usuarios_club = db.collection(collection_name).document(nombre).collection("Users")
+    collecion_usuarios_club.add({"administrador": admin})
+    for usuario in usuarios:
+        collecion_usuarios_club.add({
+            "username":usuario
+        })
+    
 
 
 if __name__ == "__main__":
