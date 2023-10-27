@@ -22,6 +22,7 @@ def login():
         session['username'] = username
         data = getDocumentsForLogin("Users", username, password)
         print(data)
+        
         if data == "Las credenciales ingresadas son incorrectas":
             message = "Las credenciales ingresadas son incorrectas"
             return render_template('inicio_sesion.html', message = message)
@@ -132,6 +133,9 @@ def register():
         clubes = get_documentos("Clubes", "club")
         print(clubes)
         return render_template('registro.html', message=message, clubes = clubes)
+    
+
+@app.route('/info', methods = ['GET', 'POST'])
     
 
 def getDocumentsForLogin(collection_name, username, password):
