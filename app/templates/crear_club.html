@@ -15,6 +15,7 @@
       <input type="text" id="nombre_club" name="nombre_club" style="width: 311px; height: 44px; left: 41px; top: 225px; position: absolute; position: absolute; background: #fff; border-radius: 15px; font-size: 21px; font-family: Inter; font-weight: 400; word-wrap: break-word">
       <!--Selector de administradores-->
       <select id="administradores" name="administradores" style="width: 311px; height: 44px; left: 41px; top: 388px; position: absolute;  background: #fff; border-radius: 15px; font-size: 21px; font-family: Inter; font-weight: 400; word-wrap: break-word">
+        <option value="administrador">administrador</option>
         {% for administrador in administradores %}
           <option value="{{administrador}}">{{administrador}}</option>
         {% endfor %}
