@@ -17,6 +17,7 @@
         }
 
         .container {
+            position: relative;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
@@ -76,28 +77,43 @@
             background-color: #FF0000;
             color: #fff;
         }
+        .btn-back {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #28a745; /* Color verde para el botón */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <button onclick="window.location.href='/usuarios_administracion';" class="btn-back">Back</button> <!-- Nuevo botón de regreso -->
         <div class="profile-pic">
             <img src="https://via.placeholder.com/150" alt="User">
         </div>
-        <div class="user-name">
-            John Doe
-        </div>
-        <label for="club">Club</label>
-        <select id="club" name="club">
-            <option value="club1">Club 1</option>
-            <option value="club2">Club 2</option>
-            <option value="club3">Club 3</option>
-        </select>
-        <label for="role">Rol</label>
-        <select id="role" name="role">
-            <option value="member">Miembro</option>
-            <option value="admin">Administrador</option>
-        </select>
-        <button class="btn-save">Guardar Cambios</button>
+        <form>
+            <div class="user-name">
+                {{usuario}}
+            </div>
+            <label for="club">Club</label>
+            <select id="club" name="club">
+                <option value="club">club</option>
+                {% for club in clubes %}
+                <option value="{{club}}">{{club}}</option>
+                {% endfor %}
+            </select>
+            <label for="role">Rol</label>
+            <select id="role" name="role">
+                <option value="rol">rol</option>
+                <option value="member">socio</option>
+                <option value="admin">administrador</option>
+            </select>
+            <button class="btn-save">Guardar Cambios</button>
+        </form>
         <button class="btn-delete">Eliminar Usuario</button>
     </div>
 </body>

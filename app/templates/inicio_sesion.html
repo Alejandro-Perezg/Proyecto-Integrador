@@ -68,16 +68,22 @@
 <body>
     <div class="container">
         <h1>Agendas Virtuales<br>Cudber & Dcorman</h1>
-        <form>
-            <input type="text" placeholder="Nombre">
-            <input type="email" placeholder="Correo electrónico">
-            <input type="password" placeholder="Contraseña">
-            <button>Registrarse</button>
-            <button>Iniciar Sesión</button>
+        <form action="/" method="POST">
+            <input type="text" placeholder="Nombre" name="username">
+            <input type="email" placeholder="Correo electrónico" name="correoElectronico">
+            <input type="password" placeholder="Contraseña" name="password">
+            <button type="submit">Iniciar Sesión</button>
         </form>
+        <div class="reset-password">
+            <a href="/register">¿Aún no tienes cuenta? Registrate aquí</a>
+        </div>
         <div class="reset-password">
             <a href="#">¿Olvidaste tu contraseña?</a>
         </div>
+        <div class="reset-password">
+            <p style="color: red">{{message}}</p>
+        </div>
+
     </div>
 </body>
 </html>

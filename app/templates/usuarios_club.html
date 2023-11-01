@@ -98,21 +98,15 @@
     </div>
     <div class="tabs">
         <div class="tab active">Usuarios</div>
-        <div class="tab">Clubes</div>
+        <div onclick="window.location.href='/administracion';" class="tab">Clubes</div>
     </div>
     <div class="user-list">
+        {% for user in users %}
         <div class="user">
-            <div class="user-name">Carlos</div>
-            <i class="edit-icon">✏️</i>
+            <div class="user-name">{{user}}</div>
+            <i onclick="window.location.href='/cambios_usuario/{{user}}';" class="edit-icon">✏️</i>
         </div>
-        <div class="user">
-            <div class="user-name">Roberto</div>
-            <i class="edit-icon">✏️</i>
-        </div>
-        <div class="user">
-            <div class="user-name">Bruno</div>
-            <i class="edit-icon">✏️</i>
-        </div>
+        {% endfor %}
         <!-- Agrega más usuarios aquí -->
     </div>
 </body>

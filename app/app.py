@@ -43,7 +43,7 @@ def home(usuario, rol):
     if 'username' in session:
         if rol == "socio":
             print(usuario, rol)
-            return render_template('menu_inicio.html')
+            return render_template('menu_inicio.html', Usuario = usuario)
         elif rol == "administrador":
             Usuario = usuario
             return render_template('menu_inicio_administracion.html', Usuario=Usuario)
@@ -76,7 +76,25 @@ def aviso_de_privacidad():
     
 @app.route('/administracion')
 def administracion():
-    return render_template('clubes_admin.html')
+    clubes = get_documentos("Clubes", "club")
+    return render_template('clubes_admin.html', clubes = clubes)
+
+@app.route('/usuarios_administracion')
+def usuarios_administracion():
+    users = get_documentos("Users", "username")
+    return render_template('usuarios_club.html', users = users)
+
+@app.route('/cambios_usuario/<string:usuario>')
+def cambios_usuario(usuario):
+    clubes = get_documentos("Clubes", "club")
+    return render_template('cambios_usuario.html', usuario = usuario, clubes = clubes)
+
+
+
+
+@app.route('/agendar_sesion')
+def agendar_sesion():
+    return render_template('agendar_sesion.html')
 
 #Crear club
 @app.route('/crear_club', methods = ['GET', 'POST'])
@@ -90,6 +108,12 @@ def crear_club():
             admins = get_admins("Users")
             usuarios = get_documentos("Users", "username")
             return render_template("/crear_club.html", administradores = admins, usuarios = usuarios, message= message)
+        elif admin == "administrador":
+            message = "Tienes que elegir un administrador"
+            admins = get_admins("Users")
+            usuarios = get_documentos("Users", "username")
+            return render_template("/crear_club.html", administradores = admins, usuarios = usuarios, message= message)
+            
         else:
             crear_club("Clubes", club, usuarios_club, admin)
             admins = get_admins("Users")
@@ -116,19 +140,22 @@ def register():
         club = request.form.get('club')
 
         if (password != repetirPassword):
+            lista_clubes = get_documentos("Clubes", "club")
             message = "¡La contraseña no concide con la confirmación de contraseña!"
-            return render_template('registro.html', message=message)
+            return render_template('registro.html', message=message, clubes= lista_clubes)
         
         elif (password == "" or repetirPassword == "" or username == ""):
             message = "Tienes que llenar todos los campos"
-            return render_template('registro.html', message=message)
+            lista_clubes = get_documentos("Clubes", "club")
+            return render_template('registro.html', message=message, clubes = lista_clubes)
         
         elif validar_correo(correoElectronico) == False:
             message = "El correo electronico no es válido."
-            return render_template('registro.html', message=message)
+            lista_clubes = get_documentos("Clubes", "club")
+            return render_template('registro.html', message=message, clubes = lista_clubes)
         
         else:
-            data = {
+            user = {
             'username': username,
             'password': password,
             'correoElectronico': correoElectronico,
@@ -136,22 +163,22 @@ def register():
             'club': club,
             'rol': 'socio'
             }
-            if usuario_existente("Users", username, correoElectronico) == "El usuario no existe":
-                doc_ref = db.collection('Users').document(username)
-                doc_ref.set(data)
+            if usuario_existente("Users", username, correoElectronico) == "El usuario no existe": 
+                register_user(user)
                 return redirect('/')
+                
             elif usuario_existente("Users", username, correoElectronico) == "El nombre de usuario o correo electronico no estan disponibles":
-                message = "El nombre de usuario o correo electronico no estan disponibles"
-                return render_template('registro.html', message = message)
+                lista_clubes = get_documentos("Clubes", "club")
+                return render_template('registro.html', message="El nombre de usuario o correo electronico no estan disponibles", clubes = lista_clubes)
             else:
                 message = "Hubo un problema con el registro"
-                return render_template('registro.html', message = message)
-
+                lista_clubes = get_documentos("Clubes", "club")
+                return render_template('registro.html', message=message, clubes = lista_clubes)
     else:
         message = ""
-        clubes = get_documentos("Clubes", "club")
-        print(clubes)
-        return render_template('registro.html', message=message, clubes = clubes)
+        lista_clubes = get_documentos("Clubes", "club")
+        print(lista_clubes)
+        return render_template('registro.html', message=message, clubes = lista_clubes)
     
 
 @app.route('/info', methods = ['GET', 'POST'])
@@ -189,13 +216,13 @@ def get_documentos(collection_name, value):
     docs = (
         db.collection(collection_name).get()
             )
-    lista_clubes = []
+    lista_docs = []
     for doc in docs:
         club = doc.get(value)
-        lista_clubes.append(club)
+        lista_docs.append(club)
 
-    print(lista_clubes)
-    return lista_clubes
+    print(lista_docs)
+    return lista_docs
  
     
 #Funcion que verifica si el usario registrado existe
@@ -215,6 +242,13 @@ def usuario_existente(collectionName, username, coreoElectronico):
             return "El nombre de usuario o correo electronico no estan disponibles"
     except:
         return "Hubo un problema con el registro"
+    
+#Funcion que registra un usuario
+def register_user(user):
+    doc_ref = db.collection('Users').document(user["username"])
+    doc_ref.set(user)
+    collecion_usuarios_club = db.collection("Clubes").document(user["club"]).collection("Users").document(user["username"])
+    collecion_usuarios_club.set({"username": user["username"]})
     
 
 #funcion que trae los usuarios que tienen el rol de administrador

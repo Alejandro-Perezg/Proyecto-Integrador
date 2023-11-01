@@ -77,7 +77,7 @@
             color: #007BFF;
             cursor: pointer;
         }
-
+        
         @media (max-width: 768px) {
             .user {
                 flex: 0 0 calc(50% - 20px);
@@ -94,26 +94,20 @@
 <body>
     <div class="header">
         <div class="title">Usuarios y Clubes</div>
-        <button class="add-button">+</button>
+        <button onclick="window.location.href='/crear_club';" class="add-button">+</button>
     </div>
     <div class="tabs">
-        <div class="tab">Usuarios</div>
+        <div onclick="window.location.href='/usuarios_administracion';" class="tab">Usuarios</div>
         <div class="tab active">Clubes</div>
     </div>
     <div class="user-list">
+        {% for club in clubes %}
         <div class="user">
-            <div class="user-name">Guadalajara</div>
-            <i class="edit-icon">⛔     ✏️</i>
+            <div class="user-name">{{club}}</div>
+            <i class="delete-icon">⛔</i>
+            <i class="edit-icon">✏️</i>
         </div>
-        <div class="user">
-            <div class="user-name">Estado de Mexico</div>
-            <i class="edit-icon">⛔     ✏️</i>
-        </div>
-        <div class="user">
-            <div class="user-name">Cuernavaca</div>
-            <i class="edit-icon">⛔     ✏️</i>
-        </div>
-        <!-- Agrega más usuarios aquí -->
+        {% endfor %}
     </div>
 </body>
 </html>

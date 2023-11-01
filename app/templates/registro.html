@@ -81,37 +81,40 @@
         <div class="header">
             <h1>Registro</h1>
         </div>
-        <div class="form-section">
-            <label>Club:</label>
-            <select id="club" name="club">
-                <option value="club1">Cuernavaca</option>
-                <option value="club2">Guadalajara</option>
-                <option value="club3">Edo de México</option>
-            </select>
-        </div>
-        <div class="form-section">
-            <label>Usuario:</label>
-            <input type="text" id="username" name="username">
-        </div>
-        <div class="form-section">
-            <label>Contraseña:</label>
-            <input type="password" id="password" name="password">
-        </div>
-        <div class="form-section">
-            <label>Repetir Contraseña:</label>
-            <input type="password" id="confirm-password" name="confirm-password">
-        </div>
-        <div class="form-section">
-            <label>Correo Electrónico:</label>
-            <input type="email" id="email" name="email">
-        </div>
-        <div class="form-section">
-            <label>Fecha de Nacimiento:</label>
-            <input type="date" id="birthdate" name="birthdate">
-        </div>
-        <div class="form-section">
-            <button class="btn-register">Registrarse</button>
-        </div>
+        <form action="/register" method="post">
+            <div class="form-section">
+                <label>Club:</label>
+                <select id="club" name="club">
+                {% for club in clubes %}
+                <option value="{{ club }}">{{ club }}</option>
+                {% endfor %}
+                </select>
+            </div>
+            <div class="form-section">
+                <label>Usuario:</label>
+                <input type="text" id="username" name="username">
+            </div>
+            <div class="form-section">
+                <label>Contraseña:</label>
+                <input type="password" id="password" name="password">
+            </div>
+            <div class="form-section">
+                <label>Repetir Contraseña:</label>
+                <input type="password" id="confirm-password" name="repetirPassword">
+            </div>
+            <div class="form-section">
+                <label>Correo Electrónico:</label>
+                <input type="email" id="email" name="correoElectronico">
+            </div>
+            <div class="form-section">
+                <label>Fecha de Nacimiento:</label>
+                <input type="date" id="birthdate" name="fechaNacimiento">
+            </div>
+            <div class="form-section">
+                <button type="submit"  class="btn-register">Registrarse</button>
+            </div>
+        </form>
+        <div style="color: red;">{{ message }}</div>
     </div>
 </body>
 </html>
