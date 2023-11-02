@@ -84,12 +84,18 @@ def usuarios_administracion():
     users = get_documentos("Users", "username")
     return render_template('usuarios_club.html', users = users)
 
-@app.route('/cambios_usuario/<string:usuario>')
+@app.route('/cambios_usuario/<string:usuario>', methods = ['GET', 'POST'])
 def cambios_usuario(usuario):
-    clubes = get_documentos("Clubes", "club")
-    return render_template('cambios_usuario.html', usuario = usuario, clubes = clubes)
-
-
+    if request.method == "POST":
+        mensaje = request.form.get('mensaje')
+        if mensaje == "eliminar usuario":
+            borrar_usuario(usuario)
+            return redirect("/administracion")
+        else:
+            return render_template('cambios_usuario.html', usuario = usuario, clubes = clubes)
+    else:
+        clubes = get_documentos("Clubes", "club")
+        return render_template('cambios_usuario.html', usuario = usuario, clubes = clubes)
 
 
 @app.route('/agendar_sesion')
@@ -112,8 +118,7 @@ def crear_club():
             message = "Tienes que elegir un administrador"
             admins = get_admins("Users")
             usuarios = get_documentos("Users", "username")
-            return render_template("/crear_club.html", administradores = admins, usuarios = usuarios, message= message)
-            
+            return render_template("/crear_club.html", administradores = admins, usuarios = usuarios, message= message)     
         else:
             crear_club("Clubes", club, usuarios_club, admin)
             admins = get_admins("Users")
@@ -267,14 +272,24 @@ def crear_club(collection_name, nombre, usuarios, admin):
     data = {"club":nombre}
     doc_ref = db.collection(collection_name).document(nombre)
     doc_ref.set(data)
-    collecion_usuarios_club = db.collection(collection_name).document(nombre).collection("Users")
-    collecion_usuarios_club.add({"administrador": admin})
+    doc_ref_admin = db.collection(collection_name).document(nombre).collection("Users").document(admin)
+    doc_ref_admin.set({"administrador":admin})
     for usuario in usuarios:
-        collecion_usuarios_club.add({
-            "username":usuario
-        })
-    
+        if usuario != admin:
+            doc_ref_user = db.collection(collection_name).document(nombre).collection("Users").document(usuario)
+            doc_ref_user.set({"username":usuario})
+        else:
+            print("El usuario elegido no se añadira, ya es el administrador del club")
 
+def borrar_usuario(user):
+    doc_ref = db.collection("Users").document(user)
+    doc_ref.delete()
+
+    lista_clubes = get_documentos("Clubes", "club")
+    for doc in lista_clubes:
+        doc_ref = db.collection("Clubes").document(doc).collection("Users").document(user)
+        doc_ref.delete()
+    
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True, port=8080)

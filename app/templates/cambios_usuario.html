@@ -95,7 +95,7 @@
         <div class="profile-pic">
             <img src="https://via.placeholder.com/150" alt="User">
         </div>
-        <form>
+        <form action="/cambios_usuario" method="POST">
             <div class="user-name">
                 {{usuario}}
             </div>
@@ -112,9 +112,54 @@
                 <option value="member">socio</option>
                 <option value="admin">administrador</option>
             </select>
-            <button class="btn-save">Guardar Cambios</button>
+            <button type="submit" class="btn-save">Guardar Cambios</button>
         </form>
-        <button class="btn-delete">Eliminar Usuario</button>
+        <button onclick="enviarMensaje('{{usuario}}')" class="btn-delete">Eliminar Usuario</button>
     </div>
 </body>
+
+<script>
+    function enviarMensaje(usuario) {
+        var mensaje = "eliminar usuario";
+
+        fetch(`/cambios_usuario/${usuario}`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: "mensaje=" + encodeURIComponent(mensaje)
+        }).then(function(response) {
+            return response.text();
+        }).then(function(data) {
+            alert(data);
+        }).catch(function(error) {
+            console.error("Error:", error);
+        });
+    }
+    
+    function enviarFormulario(event) {
+        event.preventDefault();
+        
+        var club = document.getElementById("club").value;
+        var rol = document.getElementById("input2").value;
+        var mensaje = "hubo cambios de usuario";
+    
+        var formData = new FormData();
+        formData.append("club", club);
+        formData.append("rol", rol);
+        formData.append("mensaje", mensaje);
+    
+        fetch(window.location.href, {
+            method: "POST",
+            body: formData
+        }).then(function(response) {
+            return response.text();
+        }).then(function(data) {
+            alert(data);
+        }).catch(function(error) {
+            console.error("Error:", error);
+        });
+    }
+    </script>
+
 </html>
