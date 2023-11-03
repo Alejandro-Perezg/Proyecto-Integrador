@@ -17,6 +17,7 @@
         }
 
         .container {
+            position: relative;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -30,15 +31,39 @@
         }
 
         .session-info {
-            margin: 10px 0;
+            margin: 10px 20px 10px 0px;
         }
 
         .session-info label {
             font-weight: bold;
+            display: block;
         }
 
-        .session-info p {
-            margin: 5px 0;
+        .session-info input, .session-info select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin: 0;
+            margin-right: 5px; /* Espacio en el lado derecho del campo de texto */
+        }
+
+        .date-input, .time-input {
+            width: 48%;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #28a745;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
         button {
@@ -53,10 +78,7 @@
         }
 
         select {
-            margin: 5px 0;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            margin-top: 5px;
         }
 
         @media (max-width: 768px) {
@@ -64,72 +86,66 @@
                 width: 90%;
             }
         }
-
-        @media (max-width: 480px) {
-            button {
-                padding: 8px;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Agenda de Sesión</h1>
+        <button onclick="goBack()" class="back-button">Back</button> <!-- Añadido el botón "Back" -->
+        <h1>Agendar Sesión</h1>
+        <form action="/agendar_sesion/{{usuario}}" method="POST">
         <div class="session-info">
             <label>Título de la Sesión:</label>
-            <p>Información del título de la sesión</p>
+            <input type="text" name="titulo" placeholder="Información del título de la sesión">
         </div>
 
         <div class="session-info">
             <label>Fecha:</label>
-            <p>Información de la fecha</p>
-        </div>
+            <input name="fecha" class="date-input" type="date">
 
-        <div class="session-info">
             <label>Hora:</label>
-            <p>Información de la hora</p>
+            <input name="hora" class="time-input" type="time">
         </div>
 
         <div class="session-info">
             <label>Número de Sesión:</label>
-            <p>Información del número de sesión</p>
+            <input name="numero" type="number" placeholder="Número de Sesión">
         </div>
 
-        <div class "session-info">
+        <div class="session-info">
             <label>Acceso:</label>
-            <p>Información del acceso</p>
+            <input  name ="acceso" type="text" placeholder="Acceso">
         </div>
 
         <div class="session-info">
             <label>Tema de Sesión:</label>
-            <p>Información del tema de sesión</p>
+            <input name="tema" type="text" placeholder="Tema de Sesión">
         </div>
 
         <div class="session-info">
             <label>Palabra de la Sesión:</label>
-            <p>Información de la palabra de la sesión</p>
+            <input name= "palabra" type="text" placeholder="Palabra de la Sesión">
         </div>
 
         <div class="session-info">
             <label>Definición y Ejemplo:</label>
-            <p>Información de la definición y ejemplo</p>
+            <input name="definicion_y_ejemplo" type="text" placeholder="Definición y Ejemplo">
         </div>
 
         <div class="session-info">
             <label>Invitación:</label>
-            <p>Información de la invitación</p>
+            <input name="invitacion" type="text" placeholder="Invitación">
         </div>
 
-        <div class="session-info">
-            <label>Rol:</label>
-            <select>
-                <option value="anfitrión">Anfitrión</option>
-                <option value="invitado">Invitado</option>
-                <option value="observador">Observador</option>
-            </select>
-        </div>
-
-        <button>Participar</button>
+        <button type="submit">Agendar</button>
+        <h3>{{mensaje}}</h3>
     </div>
+    </form>
 </body>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
 </html>

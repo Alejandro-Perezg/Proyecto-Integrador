@@ -17,6 +17,7 @@
         }
 
         .container {
+            position: relative;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
@@ -62,6 +63,18 @@
             }
         }
 
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #28a745;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
         @media (max-width: 480px) {
             .session {
                 flex-direction: column;
@@ -75,28 +88,24 @@
 </head>
 <body>
     <div class="container">
+        <button onclick="goBack()" class="back-button">Back</button> <!-- Añadido el botón "Back" -->
         <h1>Sesiones</h1>
+        {% for sesion in sesiones %}
         <div class="session">
             <div>
-                <p class="session-title">Sesión 1: Título de la Sesión</p>
-                <p class="session-date">Fecha: 25 de Octubre de 2023</p>
+                <p class="session-title">Título: {{sesion.titulo}}</p>
+                <p class="session-date">Fecha: {{sesion.fecha}}</p>
             </div>
             <button class="view-button">Ver</button>
         </div>
-        <div class="session">
-            <div>
-                <p class="session-title">Sesión 2: Título de la Sesión</p>
-                <p class="session-date">Fecha: 30 de Octubre de 2023</p>
-            </div>
-            <button class="view-button">Ver</button>
-        </div>
-        <div class="session">
-            <div>
-                <p class="session-title">Sesión 3: Título de la Sesión</p>
-                <p class="session-date">Fecha: 5 de Noviembre de 2023</p>
-            </div>
-            <button class="view-button">Ver</button>
-        </div>
+        {% endfor %}
     </div>
 </body>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
 </html>

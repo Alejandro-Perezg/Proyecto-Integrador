@@ -28,6 +28,7 @@
         }
 
         .header {
+            position: relative;
             background-color: #007BFF;
             color: #fff;
             padding: 20px;
@@ -72,6 +73,18 @@
             cursor: pointer;
             margin: 5px;
         }
+        
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #28a745;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
         .btn-save {
             background-color: #4CAF50;
@@ -93,6 +106,7 @@
 <body>
     <div class="container">
         <div class="header">
+            <button onclick="goBack()" class="back-button">Back</button> <!-- Añadido el botón "Back" -->
             <h1>Clubes</h1>
         </div>
         <div class="club-section">
@@ -110,4 +124,11 @@
         
     </div>
 </body>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
 </html>

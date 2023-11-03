@@ -78,13 +78,13 @@
         </div>
         <div class="button-section">
             <label>Bienvenido {{Usuario}}</label>
-            <button>Información Personal</button>
-            <button>Clubes</button>
-            <button>Sesiones Activas</button>
-            <button onclick="window.location.href='/agendar_sesion';">Agendar una sesión</button>
-            <button>Noticias</button>
-            <button>Aviso de privacidad</button>
-            <button>Donativos</button>
+            <button onclick="window.location.href='/info'">Información Personal</button>
+            <button onclick="window.location.href='/clubes'">Clubes</button>
+            <button onclick="window.location.href='/sesiones_activas/{{usuario}}';">Sesiones Activas</button>
+            <button onclick="window.location.href='/agendar_sesion/{{usuario}}';">Agendar una sesión</button>
+            <button onclick="window.location.href='/noticias'">Noticias</button>
+            <button onclick="window.location.href='/aviso_de_privacidad'">Aviso de privacidad</button>
+            <button >Donativos</button>
         </div>
     </div>
 </body>

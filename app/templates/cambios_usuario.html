@@ -95,7 +95,7 @@
         <div class="profile-pic">
             <img src="https://via.placeholder.com/150" alt="User">
         </div>
-        <form action="/cambios_usuario" method="POST">
+        <form method = "POST" onsubmit="enviarFormulario(event,'{{usuario}}' )">
             <div class="user-name">
                 {{usuario}}
             </div>
@@ -106,8 +106,8 @@
                 <option value="{{club}}">{{club}}</option>
                 {% endfor %}
             </select>
-            <label for="role">Rol</label>
-            <select id="role" name="role">
+            <label for="rol">Rol</label>
+            <select id="rol" name="rol">
                 <option value="rol">rol</option>
                 <option value="member">socio</option>
                 <option value="admin">administrador</option>
@@ -116,6 +116,7 @@
         </form>
         <button onclick="enviarMensaje('{{usuario}}')" class="btn-delete">Eliminar Usuario</button>
     </div>
+    <p>{{message}}</p>
 </body>
 
 <script>
@@ -132,34 +133,35 @@
             return response.text();
         }).then(function(data) {
             alert(data);
+            window.location.reload();
         }).catch(function(error) {
             console.error("Error:", error);
         });
     }
     
-    function enviarFormulario(event) {
+    function enviarFormulario(event, usuario) {
         event.preventDefault();
         
         var club = document.getElementById("club").value;
-        var rol = document.getElementById("input2").value;
-        var mensaje = "hubo cambios de usuario";
+        var rol = document.getElementById("rol").value;
+        var mensaje = "Cambios de usuario exitosos";
     
         var formData = new FormData();
         formData.append("club", club);
         formData.append("rol", rol);
         formData.append("mensaje", mensaje);
     
-        fetch(window.location.href, {
+        fetch(`/cambios_usuario/${usuario}`, {
             method: "POST",
             body: formData
         }).then(function(response) {
             return response.text();
         }).then(function(data) {
             alert(data);
+            window.location.reload();
         }).catch(function(error) {
             console.error("Error:", error);
         });
     }
     </script>
-
 </html>

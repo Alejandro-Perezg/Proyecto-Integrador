@@ -43,19 +43,21 @@ def home(usuario, rol):
     if 'username' in session:
         if rol == "socio":
             print(usuario, rol)
-            return render_template('menu_inicio.html', Usuario = usuario)
+            return render_template('menu_inicio.html', usuario = usuario)
         elif rol == "administrador":
             Usuario = usuario
-            return render_template('menu_inicio_administracion.html', Usuario=Usuario)
+            return render_template('menu_inicio_administracion.html', usuario=usuario)
         else:
             Usuario = usuario
-            return render_template('menu_inicio_propietario.html', Usuario=Usuario)
+            return render_template('menu_inicio_propietario.html', usuario=usuario)
     else:
         return redirect(url_for('login'))
     
-@app.route('/sesiones_activas')
-def sesiones_activas():
-    return render_template("sesiones_activas.html")
+@app.route('/sesiones_activas/<string:usuario>')
+def sesiones_activas(usuario):
+    sesiones_activas = traer_sesiones_activas(usuario)
+    print(sesiones_activas)
+    return render_template("sesiones_activas.html", sesiones = sesiones_activas)
 
 @app.route('/informacion_personal')
 def informacion_personal():
@@ -73,6 +75,10 @@ def noticias():
 def aviso_de_privacidad():
     return render_template("aviso_privacidad.html")
 
+@app.route('/info', methods = ['GET', 'POST'])
+def info():
+    return render_template('informacion_personal.html')
+
     
 @app.route('/administracion')
 def administracion():
@@ -84,6 +90,8 @@ def usuarios_administracion():
     users = get_documentos("Users", "username")
     return render_template('usuarios_club.html', users = users)
 
+
+
 @app.route('/cambios_usuario/<string:usuario>', methods = ['GET', 'POST'])
 def cambios_usuario(usuario):
     if request.method == "POST":
@@ -92,15 +100,46 @@ def cambios_usuario(usuario):
             borrar_usuario(usuario)
             return redirect("/administracion")
         else:
-            return render_template('cambios_usuario.html', usuario = usuario, clubes = clubes)
+            mensaje = request.form.get('mensaje')
+            club = request.form.get('club')
+            rol =request.form.get('rol')
+            if rol == "rol" or club == "club":
+                mensaje = ""
+                return render_template('cambios_usuario.html', usuario = usuario, clubes = clubes, mensaje = mensaje)
+            else:
+                cambios_usuario(usuario, club, rol)
+                return render_template('cambios_usuario.html', usuario = usuario, clubes = clubes, mensaje = mensaje)
     else:
         clubes = get_documentos("Clubes", "club")
         return render_template('cambios_usuario.html', usuario = usuario, clubes = clubes)
 
 
-@app.route('/agendar_sesion')
-def agendar_sesion():
-    return render_template('agendar_sesion.html')
+@app.route('/agendar_sesion/<string:usuario>', methods= ['GET','POST'])
+def agendar_sesion(usuario):
+    if request.method == 'POST':
+        titulo = request.form['titulo']
+        fecha = request.form['fecha']
+        hora = request.form['hora']
+        acceso = request.form['numero']
+        tema = request.form['tema']
+        palabra = request.form['palabra']
+        definicion = request.form['definicion_y_ejemplo']
+        invitacion = request.form['invitacion']
+        data = {'username':usuario,
+                'titulo':titulo,
+                'fecha':fecha,
+                'hora':hora,
+                'acceso':acceso,
+                'tema':tema,
+                'palabra':palabra,
+                'definicion':definicion,
+                'invitacion':invitacion}
+        
+        mensaje = agendar(data)
+        return render_template('agendar_sesion.html', mensaje = mensaje, usuario = usuario)
+    else:
+        mensaje = ""
+        return render_template('agendar_sesion.html', mensaje = mensaje, usuario = usuario)
 
 #Crear club
 @app.route('/crear_club', methods = ['GET', 'POST'])
@@ -185,8 +224,6 @@ def register():
         print(lista_clubes)
         return render_template('registro.html', message=message, clubes = lista_clubes)
     
-
-@app.route('/info', methods = ['GET', 'POST'])
     
 
 def getDocumentsForLogin(collection_name, username, password):
@@ -267,7 +304,7 @@ def get_admins(collection_name):
         admin_list.append(admin)
     return admin_list
 
-
+#Funcion para crear un club
 def crear_club(collection_name, nombre, usuarios, admin):
     data = {"club":nombre}
     doc_ref = db.collection(collection_name).document(nombre)
@@ -280,7 +317,7 @@ def crear_club(collection_name, nombre, usuarios, admin):
             doc_ref_user.set({"username":usuario})
         else:
             print("El usuario elegido no se añadira, ya es el administrador del club")
-
+#Funcion para borrar un usuario
 def borrar_usuario(user):
     doc_ref = db.collection("Users").document(user)
     doc_ref.delete()
@@ -289,6 +326,34 @@ def borrar_usuario(user):
     for doc in lista_clubes:
         doc_ref = db.collection("Clubes").document(doc).collection("Users").document(user)
         doc_ref.delete()
+    
+def cambios_usuario(user, club, rol):
+    doc_ref = db.collection("Users").document(user)
+    doc_ref.update({'club':club})
+    doc_ref.update({'rol':rol})
+    doc_ref_club = db.collection("Clubes").document(club).collection("Users").document(user)
+    doc_ref_club.set({'username':user})
+
+def agendar(data):
+    try:
+        doc_ref = db.collection("Sesiones").document(data["titulo"])
+        doc_ref.set(data)
+        return "Se agendó la cita con exito"
+    except:
+        return "Hubo un problema al agendar la cita"
+    
+def traer_sesiones_activas(user):
+    doc_ref = db.collection("Sesiones")
+    filter_admin = FieldFilter("username", "==", user)
+    docs = doc_ref.where(filter = filter_admin).get()
+    sesiones = []
+    for doc in docs:
+        sesion = doc.to_dict()
+        sesiones.append(sesion)
+    return sesiones
+    
+    
+
     
 
 if __name__ == "__main__":
