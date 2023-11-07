@@ -102,11 +102,13 @@ def cambios_usuario(usuario):
         else:
             mensaje = request.form.get('mensaje')
             club = request.form.get('club')
-            rol =request.form.get('rol')
+            rol = request.form.get('rol')
             if rol == "rol" or club == "club":
                 mensaje = ""
+                clubes = get_documentos("Clubes", "club")
                 return render_template('cambios_usuario.html', usuario = usuario, clubes = clubes, mensaje = mensaje)
             else:
+                clubes = get_documentos("Clubes", "club")
                 cambios_usuario(usuario, club, rol)
                 return render_template('cambios_usuario.html', usuario = usuario, clubes = clubes, mensaje = mensaje)
     else:
@@ -328,11 +330,17 @@ def borrar_usuario(user):
         doc_ref.delete()
     
 def cambios_usuario(user, club, rol):
-    doc_ref = db.collection("Users").document(user)
-    doc_ref.update({'club':club})
-    doc_ref.update({'rol':rol})
-    doc_ref_club = db.collection("Clubes").document(club).collection("Users").document(user)
-    doc_ref_club.set({'username':user})
+    if club == "sacar_de_clubes":
+        lista_clubes = get_documentos("Clubes", "club")
+        for doc in lista_clubes:
+            doc_ref = db.collection("Clubes").document(doc).collection("Users").document(user)
+            doc_ref.delete()
+    else:
+        doc_ref = db.collection("Users").document(user)
+        doc_ref.update({'club':club})
+        doc_ref.update({'rol':rol})
+        doc_ref_club = db.collection("Clubes").document(club).collection("Users").document(user)
+        doc_ref_club.set({'username':user})
 
 def agendar(data):
     try:
