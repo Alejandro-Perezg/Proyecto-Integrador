@@ -105,40 +105,44 @@
         <div class="header">
             <h1>Detalles de Sesión</h1>
         </div>
-        <div class="session-details">
-            <label>Titulo de la Sesión:</label>
-            <p>Título de la Sesión Ejemplo</p>
-            <label>Fecha:</label>
-            <p>10 Oct 2023</p>
-            <label>Hora:</label>
-            <p>15:00 - 16:30</p>
-            <label>Numero de Sesión:</label>
-            <p>Sesión 123</p>
-            <label>Acceso:</label>
-            <p>Público</p>
-            <label>Tema de Sesión:</label>
-            <p>Tema de la Sesión Ejemplo</p>
-            <label>Palabra de la Sesión:</label>
-            <p>Palabra de la Sesión Ejemplo</p>
-            <label>Invitación:</label>
-            <p>Texto de Invitación a la Sesión</p>
-        </div>
-        <div class="button-section">
-            <button class="btn-participate">Participar</button>
-            <select id="roles" name="roles">
-                <option value="rol1">Rol 1</option>
-                <option value="rol2">Rol 2</option>
-                <option value="rol3">Rol 3</option>
-            </select>
-            <button class="btn-save">Guardar</button>
-            <button class="btn-add-role">Añadir un Rol</button>
-            <select id="roles2" name="roles2">
-                <option value="rol1">Rol 1</option>
-                <option value="rol2">Rol 2</option>
-                <option value="rol3">Rol 3</option>
-            </select>
-            <button class="btn-save">Guardar</button>
-        </div>
+        {% if message == "Hubo un problema cargando la sesión" %}
+            <p>Hubo un error con la sesión</p>
+        {% else %}
+            <div class="session-details">
+                <label>Titulo de la Sesión:</label>
+                <p>{{sesion.titulo}}</p>
+                <label>Fecha:</label>
+                <p>{{sesion.fecha}}</p>
+                <label>Hora:</label>
+                <p>{{sesion.hora}}</p>
+                <label>Numero de Sesión:</label>
+                <p>{{sesion.numero}}</p>
+                <label>Acceso:</label>
+                <p>{{sesion.acceso}}</p>
+                <label>Tema de Sesión:</label>
+                <p>{{sesion.tema}}</p>
+                <label>Palabra de la Sesión:</label>
+                <p>{{sesion.palabra}}</p>
+                <label>Invitación:</label>
+                <p>{{sesion.invitacion}}</p>
+            </div>
+            <div class="button-section">
+                <button class="btn-participate">Participar</button>
+                <select id="roles" name="roles">
+                    <option value="rol1">Rol 1</option>
+                    <option value="rol2">Rol 2</option>
+                    <option value="rol3">Rol 3</option>
+                </select>
+                <button class="btn-save">Guardar</button>
+                <button class="btn-add-role">Añadir un Rol</button>
+                <select id="roles2" name="roles2">
+                    <option value="rol1">Rol 1</option>
+                    <option value="rol2">Rol 2</option>
+                    <option value="rol3">Rol 3</option>
+                </select>
+                <button class="btn-save">Guardar</button>
+            </div>
+        {% endif %}
     </div>
 </body>
 </html>

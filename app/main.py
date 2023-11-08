@@ -43,13 +43,13 @@ def home(usuario, rol):
     if 'username' in session:
         if rol == "socio":
             print(usuario, rol)
-            return render_template('menu_inicio.html', usuario = usuario)
+            return render_template('menu_inicio_socio.html', usuario = usuario)
         elif rol == "administrador":
-            Usuario = usuario
-            return render_template('menu_inicio_administracion.html', usuario=usuario)
+            usuario = usuario
+            return render_template('menu_inicio.html', usuario=usuario)
         else:
-            Usuario = usuario
-            return render_template('menu_inicio_propietario.html', usuario=usuario)
+            usuario = usuario
+            return render_template('menu_inicio_administracion.html', usuario=usuario)
     else:
         return redirect(url_for('login'))
     
@@ -57,11 +57,19 @@ def home(usuario, rol):
 def sesiones_activas(usuario):
     sesiones_activas = traer_sesiones_activas(usuario)
     print(sesiones_activas)
-    return render_template("sesiones_activas.html", sesiones = sesiones_activas)
+    return render_template("sesiones_activas.html", sesiones = sesiones_activas, usuario = usuario)
 
 @app.route('/informacion_personal')
 def informacion_personal():
     return render_template("informacion_personal.html")
+
+@app.route('/participar_sesion/<string:sesion>/<string:usuario>')
+def participar_sesion(sesion, usuario):
+    sesion_activa = get_sesion_activa(sesion)
+    if sesion_activa == "Hubo un problema cargando la sesión":
+        return render_template("participar_sesion.html", sesion = sesion_activa, message = sesion_activa)
+    else:
+        return render_template("participar_sesion.html", sesion = sesion_activa, message = "")
 
 @app.route('/clubes')
 def clubes():
@@ -122,11 +130,13 @@ def agendar_sesion(usuario):
         titulo = request.form['titulo']
         fecha = request.form['fecha']
         hora = request.form['hora']
-        acceso = request.form['numero']
+        acceso = request.form['acceso']
         tema = request.form['tema']
         palabra = request.form['palabra']
         definicion = request.form['definicion_y_ejemplo']
         invitacion = request.form['invitacion']
+        club = request.form['club']
+        numero = request.form['numero']
         data = {'username':usuario,
                 'titulo':titulo,
                 'fecha':fecha,
@@ -134,14 +144,22 @@ def agendar_sesion(usuario):
                 'acceso':acceso,
                 'tema':tema,
                 'palabra':palabra,
+                'numero': numero,
                 'definicion':definicion,
-                'invitacion':invitacion}
+                'invitacion':invitacion,
+                'club': club}
         
         mensaje = agendar(data)
-        return render_template('agendar_sesion.html', mensaje = mensaje, usuario = usuario)
+        clubes = traer_clubes_admin(usuario)
+        return render_template('agendar_sesion.html', mensaje = mensaje, usuario = usuario, clubes = clubes)
     else:
-        mensaje = ""
-        return render_template('agendar_sesion.html', mensaje = mensaje, usuario = usuario)
+        clubes = traer_clubes_admin(usuario)
+        if clubes == "Hubo un problema trayendo los clubes":
+            return render_template('agendar_sesion.html', mensaje = clubes, usuario = usuario, clubes = clubes)
+        else:
+            print(clubes)
+            return render_template('agendar_sesion.html', mensaje = "", usuario = usuario, clubes = clubes)
+ 
 
 #Crear club
 @app.route('/crear_club', methods = ['GET', 'POST'])
@@ -339,8 +357,12 @@ def cambios_usuario(user, club, rol):
         doc_ref = db.collection("Users").document(user)
         doc_ref.update({'club':club})
         doc_ref.update({'rol':rol})
-        doc_ref_club = db.collection("Clubes").document(club).collection("Users").document(user)
-        doc_ref_club.set({'username':user})
+        if rol == "socio":
+            doc_ref_club = db.collection("Clubes").document(club).collection("Users").document(user)
+            doc_ref_club.set({'username':user})
+        else:
+            doc_ref_club = db.collection("Clubes").document(club).collection("Users").document(user)
+            doc_ref_club.set({'administrador':user})
 
 def agendar(data):
     try:
@@ -349,19 +371,62 @@ def agendar(data):
         return "Se agendó la cita con exito"
     except:
         return "Hubo un problema al agendar la cita"
-    
-def traer_sesiones_activas(user):
-    doc_ref = db.collection("Sesiones")
-    filter_admin = FieldFilter("username", "==", user)
-    docs = doc_ref.where(filter = filter_admin).get()
-    sesiones = []
-    for doc in docs:
-        sesion = doc.to_dict()
-        sesiones.append(sesion)
-    return sesiones
-    
-    
 
+
+#Esta funcion recibe un administrador y trae los clubes del administrador
+def traer_clubes_admin(admin):
+        try:
+            # Obtiene una referencia a la colección "Clubes"
+            clubes_ref = db.collection("Clubes")
+            clubes_con_admin = []
+            # Itera sobre los clubes
+            for club in clubes_ref.stream():
+                # Obtiene una referencia a la subcolección "Users" dentro de cada club
+                users_ref = clubes_ref.document(club.id).collection("Users")
+                
+                # Realiza la consulta para encontrar usuarios con un administrador específico
+                filter = FieldFilter("administrador", "==", admin)
+                query = users_ref.where(filter = filter).get()
+                
+                # Si hay usuarios con ese administrador en la subcolección "Users" del club
+                if query:
+                    clubes_con_admin.append(club.id)
+            return clubes_con_admin
+        except:
+            return "Hubo un problema trayendo los clubes"
+        
+
+def traer_sesiones_activas(usuario):
+    clubes = db.collection("Clubes")
+    clubes_con_usuario = []
+    for club in clubes.stream():
+        users_ref = clubes.document(club.id).collection("Users")
+        filter_username = FieldFilter("username", "==", usuario)
+        filter_admin = FieldFilter("administrador", "==", usuario)
+        filter_or = Or(filters=[filter_username, filter_admin])
+        query = users_ref.where(filter = filter_or).get()
+        if query:
+            clubes_con_usuario.append(club.id)
+    print(clubes_con_usuario)
+    sesiones = []
+    for club in clubes_con_usuario:
+        sesion = db.collection("Sesiones")
+        filter = FieldFilter("club", "==", club)
+        query = sesion.where(filter = filter).get()
+        for sesion in query:
+            sesiones.append(sesion.to_dict())
+    print(sesiones)
+    return sesiones
+
+def get_sesion_activa(titulo):
+    try:
+        sesion = db.collection("Sesiones")
+        filter = FieldFilter("titulo", "==", titulo)
+        query = sesion.where(filter = filter).get()
+        return query[0].to_dict()
+    except:
+        return "Hubo un problema cargando la sesión"
+    
     
 
 if __name__ == "__main__":

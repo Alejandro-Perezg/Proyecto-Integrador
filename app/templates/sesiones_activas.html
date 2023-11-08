@@ -96,7 +96,7 @@
                 <p class="session-title">Título: {{sesion.titulo}}</p>
                 <p class="session-date">Fecha: {{sesion.fecha}}</p>
             </div>
-            <button class="view-button">Ver</button>
+            <button onclick="window.location.href='/participar_sesion/{{sesion.titulo}}/{{usuario}}';" class="view-button">Ver</button>
         </div>
         {% endfor %}
     </div>
