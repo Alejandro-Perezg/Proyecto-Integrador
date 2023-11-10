@@ -17,6 +17,7 @@
         }
 
         .container {
+            position: relative;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
@@ -28,6 +29,7 @@
         }
 
         .header {
+            position: relative;
             background-color: #007BFF;
             color: #fff;
             padding: 20px;
@@ -57,18 +59,19 @@
 
         .button-section {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
             margin-top: 20px;
         }
 
         .button-section button {
+            width: 100%;
             padding: 10px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            margin: 5px;
+            margin: 5px 0;
         }
 
         .btn-save {
@@ -81,16 +84,22 @@
             color: #fff;
         }
 
-        .btn-add-role {
-            background-color: #007BFF;
-            color: #fff;
-        }
-
         select {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
+        }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #28a745;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
         @media (max-width: 768px) {
@@ -103,12 +112,16 @@
 <body>
     <div class="container">
         <div class="header">
+            <button onclick="goBack()" class="back-button">Back</button> <!-- Añadido el botón "Back" -->
             <h1>Detalles de Sesión</h1>
         </div>
         {% if message == "Hubo un problema cargando la sesión" %}
-            <p>Hubo un error con la sesión</p>
+            <p>{{message}}</p>
+        {% elif message == "Participación registrada" %}
+            <p>{{message}}</p>
         {% else %}
             <div class="session-details">
+                <p style="color: red;">{{message}}</p>
                 <label>Titulo de la Sesión:</label>
                 <p>{{sesion.titulo}}</p>
                 <label>Fecha:</label>
@@ -125,8 +138,57 @@
                 <p>{{sesion.palabra}}</p>
                 <label>Invitación:</label>
                 <p>{{sesion.invitacion}}</p>
+                <label>Club:</label>
+                <p>{{sesion.club}}</p>
+
+                <label>Participantes Etapa 1:</label>
+                {%for participante in primera_etapa%}
+                <p>{{participante}}</p> 
+                {% endfor %}
+
+                <label>Participantes Etapa 2:</label> 
+                {%for participante in segunda_etapa%}
+                <p>{{participante}}</p> 
+                {% endfor %}
+                <label>Participantes Etapa 3:</label>
+                {%for participante in tercera_etapa%}
+                <p>{{participante}}</p> 
+                {% endfor %}
+                <label>Participantes Etapa 4:</label> 
+                {%for participante in cuarta_etapa%}
+                <p>{{participante}}</p> 
+                {% endfor %}
+            </div>
+
+                <h2>Participantes Etapa 1</h2> 
+           
+
+            <div class="button-section">
+                <form action="/participar_sesion/{{sesion.titulo}}/{{usuario}}" method="post">
+                    <input type="hidden" name="etapa" value="primera_etapa">
+                    <button type="submit" class="btn-participate">Participar en Etapa 1</button>
+                </form>
+                <form action="/participar_sesion/{{sesion.titulo}}/{{usuario}}" method="post">
+                    <input type="hidden" name="etapa" value="segunda_etapa">
+                    <button type="submit" class="btn-participate">Participar en Etapa 2</button>
+                </form>
+                <form action="/participar_sesion/{{sesion.titulo}}/{{usuario}}" method="post">
+                    <input type="hidden" name="etapa" value="tercera_etapa">
+                    <button type="submit" class="btn-participate">Participar en Etapa 3</button>
+                </form> 
+                <from action="/participar_sesion/{{sesion.titulo}}/{{usuario}}" method="post">
+                    <input type="hidden" name="etapa" value="cuarta_etapa">
+                    <button type="submit" class="btn-participate">Participar en Etapa 4</button>
+                </from>
             </div>
         {% endif %}
     </div>
 </body>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
 </html>

@@ -17,6 +17,7 @@
         }
 
         .container {
+            position: relative;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
@@ -24,8 +25,20 @@
             width: 80%;
             max-width: 600px;
         }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #28a745;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
         .header {
+            position: relative;
             background-color: #007BFF;
             color: #fff;
             padding: 20px;
@@ -46,6 +59,7 @@
 <body>
     <div class="container">
         <div class="header">
+            <button onclick="goBack()" class="back-button">Back</button>
             <h1>Aviso de Privacidad</h1>
         </div>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus vitae tincidunt leo. Proin feugiat ut nulla non laoreet. Nulla facilisi. Cras viverra urna a diam tincidunt, et volutpat neque accumsan. Fusce eu felis varius, iaculis velit in, auctor est. Phasellus dapibus orci at dolor sagittis, ac tristique ante consectetur.</p>
@@ -54,4 +68,11 @@
         <p>Phasellus in erat vel odio viverra euismod. Suspendisse accumsan, neque ut dapibus tristique, justo lectus feugiat nulla, non congue odio urna id nisi. Aliquam in ligula eu sapien feugiat cursus. Nulla facilisi. Suspendisse vitae dapibus nisi, at sollicitudin dolor.</p>
     </div>
 </body>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
 </html>

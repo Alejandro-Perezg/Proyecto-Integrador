@@ -91,7 +91,7 @@
 </head>
 <body>
     <div class="container">
-        <button onclick="goBack()" class="back-button">Back</button> <!-- Añadido el botón "Back" -->
+        <button onclick="window.location.href='/home/{{usuario}}/administrador';" class="back-button">Back</button> <!-- Añadido el botón "Back" -->
         <h1>Agendar Sesión</h1>
         <form action="/agendar_sesion/{{usuario}}" method="POST">
         <div class="session-info">
@@ -104,7 +104,12 @@
             <input name="fecha" class="date-input" type="date">
 
             <label>Hora:</label>
-            <input name="hora" class="time-input" type="time">
+            <select id="hora" name="hora">
+            <option value="hora">hora</option>
+            {% for hora in horas %}
+            <option value="{{ hora }}">{{ hora }}</option>
+            {% endfor %}
+            </select>
         </div>
 
         <div class="session-info">
