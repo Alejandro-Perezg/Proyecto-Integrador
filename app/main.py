@@ -67,7 +67,9 @@ def informacion_personal():
 def participar_sesion(sesion, usuario):
     if request.method == "POST":
         etapa = request.form.get("etapa")
-        message = participar_en_sesion(sesion, usuario, etapa)
+        rol = request.form.get("rol")
+        print(etapa)
+        message = participar_en_sesion(sesion, usuario, etapa, rol)
         sesion_activa = get_sesion_activa(sesion)
         if sesion_activa == "Hubo un problema cargando la sesión":
             return render_template("participar_sesion_1.html", sesion = sesion_activa, message = sesion_activa, usuario = usuario)
@@ -513,7 +515,7 @@ def obtener_lista_de_horas():
     return horas
 
 
-def participar_en_sesion(sesion, usuario, etapa):
+def participar_en_sesion(sesion, usuario, etapa, rol):
         # Obtén una referencia a la colección "Sesiones" y a la sesión específica
         db = firestore.client()
         sesion_ref = db.collection("Sesiones").document(sesion)
@@ -530,7 +532,7 @@ def participar_en_sesion(sesion, usuario, etapa):
 
         # Añade el usuario a la lista de la etapa correspondiente
         sesion_ref.update({
-            etapa: firestore.ArrayUnion([{u'username': usuario}])
+            etapa: firestore.ArrayUnion([{u'user': {'username': usuario, 'rol': rol}}])
         })
         return "Participación registrada"
 
@@ -539,9 +541,8 @@ def get_participantes(sesion, etapa):
 
     # Obtiene los datos de la sesión
     sesion_data = sesion_ref.get().to_dict()
-
-    # Verifica si la lista "primera_etapa" existe y obtén los usernames
-    usernames = [etapa.get('username') for etapa in sesion_data[etapa]]
+    usernames1 = {}
+    usernames = [etapa.get('user',{}).get("username") for etapa in sesion_data[etapa]]
     return usernames
     
     

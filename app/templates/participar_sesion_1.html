@@ -73,6 +73,32 @@
             cursor: pointer;
             margin: 5px 0;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 20px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
 
         .btn-save {
             background-color: #4CAF50;
@@ -101,6 +127,16 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        .participants-list label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .button-container {
+            margin-bottom: 10px;
+        }
+        .button-section form {
+            margin-bottom: 10px;
+        }
 
         @media (max-width: 768px) {
             .container {
@@ -120,6 +156,23 @@
         {% elif message == "Participación registrada" %}
             <p>{{message}}</p>
         {% else %}
+            <div id="participateModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <h2 id="modalTitle">Participar en Etapa</h2>
+                    <form action="/participar_sesion/{{sesion.titulo}}/{{usuario}}" method="post">
+                        <input type="hidden" id="etapaInput" name="etapa" value="">
+                        <label for="etapaSelector">Selecciona tu opción:</label>
+                        <select id="etapaSelector" name="rol">
+                            <option value="Rol1">Rol 1</option>
+                            <option value="Rol2">Rol 2</option>
+                            <option value="Rol3">Rol 3</option>
+                            <option value="Rol4">Rol 4</option>
+                        </select>
+                        <button type="submit" class="btn-participate">Participar</button>
+                    </form>
+                </div>
+            </div>
             <div class="session-details">
                 <p style="color: red;">{{message}}</p>
                 <label>Titulo de la Sesión:</label>
@@ -141,54 +194,71 @@
                 <label>Club:</label>
                 <p>{{sesion.club}}</p>
 
-                <label>Participantes Etapa 1:</label>
-                {%for participante in primera_etapa%}
-                <p>{{participante}}</p> 
-                {% endfor %}
-
-                <label>Participantes Etapa 2:</label> 
-                {%for participante in segunda_etapa%}
-                <p>{{participante}}</p> 
-                {% endfor %}
-                <label>Participantes Etapa 3:</label>
-                {%for participante in tercera_etapa%}
-                <p>{{participante}}</p> 
-                {% endfor %}
-                <label>Participantes Etapa 4:</label> 
-                {%for participante in cuarta_etapa%}
-                <p>{{participante}}</p> 
-                {% endfor %}
-            </div>
-
-                <h2>Participantes Etapa 1</h2> 
-           
+                <div class="participants-list">
+                    <label>Participantes Etapa 1:</label>
+                    {% for participante in primera_etapa %}
+                        <p>{{ participante }}</p>
+                    {% endfor %}
+                </div>
+    
+                <div class="participants-list">
+                    <label>Participantes Etapa 2:</label> 
+                    {% for participante in segunda_etapa %}
+                        <p>{{ participante }}</p>
+                    {% endfor %}
+                </div>
+                <div class="participants-list">
+                    <label>Participantes Etapa 3:</label>
+                    {% for participante in tercera_etapa %}
+                        <p>{{ participante }}</p>
+                    {% endfor %}
+                </div>
+    
+                <div class="participants-list">
+                    <label>Participantes Etapa 4:</label> 
+                    {% for participante in cuarta_etapa %}
+                        <p>{{ participante }}</p>
+                    {% endfor %}
+                </div>
+            </div>           
 
             <div class="button-section">
-                <form action="/participar_sesion/{{sesion.titulo}}/{{usuario}}" method="post">
-                    <input type="hidden" name="etapa" value="primera_etapa">
-                    <button type="submit" class="btn-participate">Participar en Etapa 1</button>
-                </form>
-                <form action="/participar_sesion/{{sesion.titulo}}/{{usuario}}" method="post">
-                    <input type="hidden" name="etapa" value="segunda_etapa">
-                    <button type="submit" class="btn-participate">Participar en Etapa 2</button>
-                </form>
-                <form action="/participar_sesion/{{sesion.titulo}}/{{usuario}}" method="post">
-                    <input type="hidden" name="etapa" value="tercera_etapa">
-                    <button type="submit" class="btn-participate">Participar en Etapa 3</button>
-                </form> 
-                <from action="/participar_sesion/{{sesion.titulo}}/{{usuario}}" method="post">
-                    <input type="hidden" name="etapa" value="cuarta_etapa">
-                    <button type="submit" class="btn-participate">Participar en Etapa 4</button>
-                </from>
+                <div class="button-container">
+                    <button type="button" onclick="openModal('primera')" class="btn-participate">Participar en Etapa 1</button>
+                </div>
+                 
+                <div class="button-container">
+                    <button type="button" onclick="openModal('segunda')" class="btn-participate">Participar en Etapa 2</button>
+                </div>
+                <div class="button-container">
+                    <button type="button" onclick="openModal('tercera')" class="btn-participate">Participar en Etapa 3</button>
+                </div>
+                <div class="button-container">
+                    <button type="button" onclick="openModal('cuarta')" class="btn-participate">Participar en Etapa 4</button>
+                </div>
             </div>
         {% endif %}
     </div>
 </body>
 
 <script>
+
     function goBack() {
         window.history.back();
     }
+
+    // Función para abrir el modal
+    function openModal(etapa) {
+        document.getElementById('modalTitle').innerText = 'Participar en la ' + etapa + 'etapa';
+        document.getElementById('participateModal').style.display = 'flex';
+        document.getElementById('etapaInput').value = etapa+ '_etapa';
+    }
+
+    // Función para cerrar el modal
+    function closeModal() {
+        document.getElementById('participateModal').style.display = 'none';
+    }
+
 </script>
 
 </html>
