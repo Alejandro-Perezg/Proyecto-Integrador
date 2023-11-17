@@ -83,14 +83,6 @@
         </div>
         <form action="/register" method="post">
             <div class="form-section">
-                <label>Club:</label>
-                <select id="club" name="club">
-                {% for club in clubes %}
-                <option value="{{ club }}">{{ club }}</option>
-                {% endfor %}
-                </select>
-            </div>
-            <div class="form-section">
                 <label>Usuario:</label>
                 <input type="text" id="username" name="username">
             </div>

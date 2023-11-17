@@ -57,7 +57,6 @@ def home(usuario, rol):
 @app.route('/sesiones_activas/<string:usuario>')
 def sesiones_activas(usuario):
     sesiones_activas = traer_sesiones_activas(usuario)
-    print(sesiones_activas)
     return render_template("sesiones_activas.html", sesiones = sesiones_activas, usuario = usuario)
 
 @app.route('/informacion_personal/<string:usuario>')
@@ -178,6 +177,7 @@ def agendar_sesion(usuario):
     if request.method == 'POST':
         titulo = request.form['titulo']
         fecha = request.form['fecha']
+        fecha_datetime = datetime.strptime(fecha, "%Y-%m-%d")
         hora = request.form['hora']
         acceso = request.form['acceso']
         tema = request.form['tema']
@@ -188,7 +188,7 @@ def agendar_sesion(usuario):
         numero = request.form['numero']
         data = {'username':usuario,
                 'titulo':titulo,
-                'fecha':fecha,
+                'fecha':fecha_datetime,
                 'hora':hora,
                 'acceso':acceso,
                 'tema':tema,
@@ -255,7 +255,6 @@ def register():
         repetirPassword = request.form['repetirPassword']
         correoElectronico = request.form['correoElectronico']
         fechaNacimiento = request.form['fechaNacimiento']
-        club = request.form.get('club')
 
         if (password != repetirPassword):
             lista_clubes = get_documentos("Clubes", "club")
@@ -278,7 +277,7 @@ def register():
             'password': password,
             'correoElectronico': correoElectronico,
             'fechaNacimiento': fechaNacimiento,
-            'club': club,
+            'club': 'Sin club',
             'rol': 'socio'
             }
             if usuario_existente("Users", username, correoElectronico) == "El usuario no existe": 
@@ -361,10 +360,9 @@ def usuario_existente(collectionName, username, coreoElectronico):
     
 #Funcion que registra un usuario
 def register_user(user):
+
     doc_ref = db.collection('Users').document(user["username"])
     doc_ref.set(user)
-    collecion_usuarios_club = db.collection("Clubes").document(user["club"]).collection("Users").document(user["username"])
-    collecion_usuarios_club.set({"username": user["username"]})
     
 
 #funcion que trae los usuarios que tienen el rol de administrador
@@ -499,10 +497,12 @@ def traer_sesiones_activas(usuario):
     for club in clubes_con_usuario:
         sesion = db.collection("Sesiones")
         filter_club = FieldFilter("club", "==", club)
-        filter_fecha = FieldFilter("fecha", ">", datetime.now())
+        fecha_actual = datetime.now()
+        print(fecha_actual)
+        filter_fecha = FieldFilter('fecha', '>', fecha_actual)
         filter_and = And(filters=[filter_club, filter_fecha])
-
         query = sesion.where(filter = filter_and).get()
+        print(f"Club: {club}, Query Result: {query}")
         for sesion in query:
             sesiones.append(sesion.to_dict())
     print(sesiones)
