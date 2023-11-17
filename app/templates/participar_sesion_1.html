@@ -197,27 +197,27 @@
                 <div class="participants-list">
                     <label>Participantes Etapa 1:</label>
                     {% for participante in primera_etapa %}
-                        <p>{{ participante }}</p>
+                        <p>{{ participante.user.username }}, rol: {{ participante.user.rol }}</p>
                     {% endfor %}
                 </div>
     
                 <div class="participants-list">
                     <label>Participantes Etapa 2:</label> 
                     {% for participante in segunda_etapa %}
-                        <p>{{ participante }}</p>
+                        <p>{{ participante.user.username }}, rol: {{ participante.user.rol }}</p>
                     {% endfor %}
                 </div>
                 <div class="participants-list">
                     <label>Participantes Etapa 3:</label>
                     {% for participante in tercera_etapa %}
-                        <p>{{ participante }}</p>
+                        <p>{{ participante.user.username }}, rol: {{ participante.user.rol }}</p>
                     {% endfor %}
                 </div>
     
                 <div class="participants-list">
                     <label>Participantes Etapa 4:</label> 
                     {% for participante in cuarta_etapa %}
-                        <p>{{ participante }}</p>
+                        <p>{{ participante.user.username }}, rol: {{ participante.user.rol }}</p>
                     {% endfor %}
                 </div>
             </div>           

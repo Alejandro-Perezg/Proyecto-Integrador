@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template, redirect, session, url_for
 import re
-
+from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -46,7 +46,8 @@ def home(usuario, rol):
             return render_template('menu_inicio_socio.html', usuario = usuario)
         elif rol == "administrador":
             usuario = usuario
-            return render_template('menu_inicio.html', usuario=usuario)
+            clubes = traer_clubes_admin(usuario)
+            return render_template('menu_inicio.html', usuario=usuario, clubes = clubes)
         else:
             usuario = usuario
             return render_template('menu_inicio_administracion.html', usuario=usuario)
@@ -59,9 +60,11 @@ def sesiones_activas(usuario):
     print(sesiones_activas)
     return render_template("sesiones_activas.html", sesiones = sesiones_activas, usuario = usuario)
 
-@app.route('/informacion_personal')
-def informacion_personal():
-    return render_template("informacion_personal.html")
+@app.route('/informacion_personal/<string:usuario>')
+def informacion_personal(usuario):
+    user = get_info_usuario(usuario)
+
+    return render_template("informacion_personal.html", usuario = user)
 
 @app.route('/participar_sesion/<string:sesion>/<string:usuario>', methods = ['GET', 'POST'])
 def participar_sesion(sesion, usuario):
@@ -104,12 +107,7 @@ def noticias():
 @app.route('/aviso_de_privacidad')
 def aviso_de_privacidad():
     return render_template("aviso_privacidad.html")
-
-@app.route('/info', methods = ['GET', 'POST'])
-def info():
-    return render_template('informacion_personal.html')
-
-    
+  
 @app.route('/administracion')
 def administracion():
     clubes = get_documentos("Clubes", "club")
@@ -125,6 +123,30 @@ def club(club):
     usuarios = obtener_usuarios_de_club(club)
     print(usuarios)
     return render_template('info_club.html', usuarios = usuarios, club = club)
+
+@app.route('/club_admin/<string:usuario>/<string:club>', methods = ['GET', 'POST'])
+def club_admin(usuario, club):
+    if request.form.get("valor") == "1":
+        usuarios = obtener_usuarios_de_club_admin(club)
+        print(usuarios)
+        return render_template('info_club_admin.html', usuarios = usuarios, club = club, message = "")
+    else:
+        message = eliminar_usuario_de_club(usuario, club)
+        usuarios = obtener_usuarios_de_club_admin(club)
+        return render_template('info_club_admin.html', usuarios = usuarios, club = club, message = message)
+
+
+
+@app.route('/usuarios_admin/<string:usuario>/<string:club>', methods = ['GET', 'POST'])
+def usuarios_admin(usuario, club):
+    if request.method == 'POST':
+        if request.form.get("valor") == "1":
+            usuarios = get_documentos("Users", "username")
+            return render_template("usuarios_admin.html", usuarios = usuarios, usuario = usuario, club = club, message = "")
+        else:
+            usuarios = get_documentos("Users", "username")
+            message = agregar_usuario_a_club(usuario, club)
+            return render_template("usuarios_admin.html", usuarios = usuarios, usuario = usuario, club = club, message = message)
 
 
 @app.route('/cambios_usuario/<string:usuario>', methods = ['GET', 'POST'])
@@ -398,6 +420,24 @@ def cambios_usuario(user, club, rol):
             doc_ref_club = db.collection("Clubes").document(club).collection("Users").document(user)
             doc_ref_club.set({'administrador':user})
 
+def agregar_usuario_a_club(user, club):
+    try:
+        doc_ref_club = db.collection("Clubes").document(club).collection("Users").document(user)
+        doc_ref_club.set({'username':user})
+        return "Se añadio el usuario " + user + " al club " + club
+    except:
+        return "Hubo un problema añadiendo al usuario"
+    
+def eliminar_usuario_de_club(user, club):
+    try:
+        doc_ref_club = db.collection("Clubes").document(club).collection("Users").document(user)
+        doc_ref_club.delete()
+        return "Se eliminó el usuario " + user + " del club " + club
+    except:
+        return "Hubo un problema eliminando al usuario"
+
+
+
 def agendar(data):
         try:
             doc_ref = db.collection("Sesiones")
@@ -458,8 +498,11 @@ def traer_sesiones_activas(usuario):
     sesiones = []
     for club in clubes_con_usuario:
         sesion = db.collection("Sesiones")
-        filter = FieldFilter("club", "==", club)
-        query = sesion.where(filter = filter).get()
+        filter_club = FieldFilter("club", "==", club)
+        filter_fecha = FieldFilter("fecha", ">", datetime.now())
+        filter_and = And(filters=[filter_club, filter_fecha])
+
+        query = sesion.where(filter = filter_and).get()
         for sesion in query:
             sesiones.append(sesion.to_dict())
     print(sesiones)
@@ -496,6 +539,21 @@ def obtener_usuarios_de_club(club):
             usuarios.append(usuario)
     return usuarios
 
+def obtener_usuarios_de_club_admin(club):
+    # Hacer el query a la colección "Clubes" y la subcolección "Users"
+    club_ref = db.collection('Clubes').document(club).collection('Users')
+    
+    # Obtener los documentos de la subcolección "Users"
+    docs = club_ref.stream()
+    
+    # Inicializar una lista para almacenar los usuarios
+    usuarios = []
+    for doc in docs:
+        usuario = doc.to_dict()
+        if "username" in usuario:
+            usuarios.append(usuario)
+    return usuarios
+
 
 def obtener_lista_de_horas():
     # Hacer el query a la colección "Horas"
@@ -523,12 +581,6 @@ def participar_en_sesion(sesion, usuario, etapa, rol):
         # Verificar si el usuario ya está en alguna etapa
         sesion_data = sesion_ref.get().to_dict()
 
-        for etapa_key in ["primera_etapa", "segunda_etapa", "tercera_etapa", "cuarta_etapa"]:
-            if sesion_data.get(etapa_key):
-                for participante in sesion_data[etapa_key]:
-                    if participante.get("username") == usuario:
-                        # El usuario ya está en esta etapa, no se añade nuevamente
-                        return "Ya tienes un rol en la sesión"
 
         # Añade el usuario a la lista de la etapa correspondiente
         sesion_ref.update({
@@ -541,9 +593,23 @@ def get_participantes(sesion, etapa):
 
     # Obtiene los datos de la sesión
     sesion_data = sesion_ref.get().to_dict()
-    usernames1 = {}
-    usernames = [etapa.get('user',{}).get("username") for etapa in sesion_data[etapa]]
-    return usernames
+    usernames1 = []
+    print(sesion_data[etapa])
+    for user in sesion_data[etapa]:
+        usuario = {"user":{"username": "", "rol": ""}}
+        username = user.get('user',{}).get("username")
+        usuario["user"]["username"] = username
+        rol = user.get('user',{}).get("rol")
+        usuario["user"]["rol"] = rol
+        usernames1.append(usuario)
+    print(usernames1)    
+    return usernames1
+
+def get_info_usuario(usuario):
+    doc_ref = db.collection("Users").document(usuario)
+    usuario = doc_ref.get().to_dict()
+    return usuario
+
     
     
 

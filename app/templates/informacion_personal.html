@@ -80,24 +80,24 @@
             <h1>Información Personal</h1>
         </div>
         <div class="info-section">
-            <label>Nombre:</label>
-            <p>Alejandro Perez Gonzalez</p>
+            <label>Username:</label>
+            <p>{{ usuario.username }}</p>
         </div>
         <div class="info-section">
-            <label>Fecha de Ingreso:</label>
-            <p>05 Sep 2022</p>
+            <label>Correo Electronico:</label>
+            <p>{{usuario.correoElectronico}}</p>
+        </div>
+        <div class="info-section">
+            <label>Password:</label>
+            <p>{{ usuario.password}}</p>
         </div>
         <div class="info-section">
             <label>Rol:</label>
-            <p>Toastmaster</p>
+            <p>{{ usuario.rol }}</p>
         </div>
         <div class="info-section">
-            <label>Formación Profesional:</label>
-            <p>Ingeniero en Sistemas Computacionales</p>
-        </div>
-        <div class="info-section">
-            <label>Cumpleaños:</label>
-            <p>14 Ene 1999</p>
+            <label>Club:</label>
+            <p>{{ usuario.club }}</p>
         </div>
     </div>
 </body>

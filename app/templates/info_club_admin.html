@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club Name</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            position: relative;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .club-name {
+            font-weight: bold;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #28a745;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .user-name {
+            font-weight: bold;
+        }
+
+        .edit-icon {
+            color: #007BFF;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button onclick="goBack()" class="back-button">Back</button>
+        <h1>{{club}}</h1>
+        <div class="club-name">Usuarios</div>
+        
+        {% for usuario in usuarios %}
+            <div class="user">
+                <div class="user-name">{{usuario.username}}</div>
+                <form action="/club_admin/{{usuario.username}}/{{club}}" method="post">
+                    <input type="hidden" id="valor" name="valor" value="2">
+                    <button type="submit" class="edit-icon">✏️</i>
+                </form>
+            </div>
+        {% endfor %}
+        <div>
+            <p style="color: #28a745;">{{message}}</p>
+        </div>
+    </div>
+</body>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
+</html>
