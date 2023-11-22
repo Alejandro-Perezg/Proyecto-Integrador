@@ -59,6 +59,13 @@ def sesiones_activas(usuario):
     sesiones_activas = traer_sesiones_activas(usuario)
     return render_template("sesiones_activas.html", sesiones = sesiones_activas, usuario = usuario)
 
+@app.route('/sesiones_pasadas/<string:usuario>')
+def sesiones_pasadas(usuario):
+    sesiones_activas = traer_sesiones_pasadas(usuario)
+    return render_template("sesiones_pasadas.html", sesiones = sesiones_activas, usuario = usuario)
+
+
+
 @app.route('/informacion_personal/<string:usuario>')
 def informacion_personal(usuario):
     user = get_info_usuario(usuario)
@@ -94,6 +101,24 @@ def participar_sesion(sesion, usuario):
                                     segunda_etapa = segunda_etapa,
                                     tercera_etapa = tercera_etapa,
                                     cuarta_etapa = cuarta_etapa)
+        
+@app.route('/sesion_pasada/<string:sesion>/<string:usuario>', methods = ['GET', 'POST'])
+def sesion_pasada(sesion, usuario):
+    sesion_activa = get_sesion_activa(sesion)
+    primera_etapa = get_participantes(sesion, "primera_etapa")
+    segunda_etapa = get_participantes(sesion, "segunda_etapa")
+    tercera_etapa = get_participantes(sesion, "tercera_etapa")
+    cuarta_etapa = get_participantes(sesion, "cuarta_etapa")
+    if sesion_activa == "Hubo un problema cargando la sesión":
+        return render_template("sesion_pasada.html", sesion = sesion_activa, message = sesion_activa, usuario = usuario)
+    else:
+        return render_template("sesion_pasada.html", sesion = sesion_activa,
+                                message = "",
+                                usuario = usuario,
+                                primera_etapa = primera_etapa,
+                                segunda_etapa = segunda_etapa,
+                                tercera_etapa = tercera_etapa,
+                                cuarta_etapa = cuarta_etapa)
 
 @app.route('/clubes')
 def clubes():
@@ -186,6 +211,15 @@ def agendar_sesion(usuario):
         invitacion = request.form['invitacion']
         club = request.form['club']
         numero = request.form['numero']
+        roles = {}
+
+        for key, value in request.form.items():
+            if key.startswith('rol'):
+                roles[key] = value
+
+        for key, value in roles.items():
+            print(f'{key}: {value}')
+
         data = {'username':usuario,
                 'titulo':titulo,
                 'fecha':fecha_datetime,
@@ -200,7 +234,9 @@ def agendar_sesion(usuario):
                 "primera_etapa": [],
                 "segunda_etapa": [],
                 "tercera_etapa": [],
-                "cuarta_etapa": []}
+                "cuarta_etapa": [],
+                "roles": {"rol1":"Rol1","Rol2":"Rol2", "Rol3":"Rol3","Rol4":"Rol4"},
+                "roles_extra": roles}
 
         mensaje = agendar(data)
         clubes = traer_clubes_admin(usuario)
@@ -508,6 +544,33 @@ def traer_sesiones_activas(usuario):
     print(sesiones)
     return sesiones
 
+def traer_sesiones_pasadas(usuario):
+    clubes = db.collection("Clubes")
+    clubes_con_usuario = []
+    for club in clubes.stream():
+        users_ref = clubes.document(club.id).collection("Users")
+        filter_username = FieldFilter("username", "==", usuario)
+        filter_admin = FieldFilter("administrador", "==", usuario)
+        filter_or = Or(filters=[filter_username, filter_admin])
+        query = users_ref.where(filter = filter_or).get()
+        if query:
+            clubes_con_usuario.append(club.id)
+    print(clubes_con_usuario)
+    sesiones = []
+    for club in clubes_con_usuario:
+        sesion = db.collection("Sesiones")
+        filter_club = FieldFilter("club", "==", club)
+        fecha_actual = datetime.now()
+        print(fecha_actual)
+        filter_fecha = FieldFilter('fecha', '<', fecha_actual)
+        filter_and = And(filters=[filter_club, filter_fecha])
+        query = sesion.where(filter = filter_and).get()
+        print(f"Club: {club}, Query Result: {query}")
+        for sesion in query:
+            sesiones.append(sesion.to_dict())
+    print(sesiones)
+    return sesiones
+
 def get_sesion_activa(titulo):
     try:
         sesion = db.collection("Sesiones")
@@ -604,6 +667,8 @@ def get_participantes(sesion, etapa):
         usernames1.append(usuario)
     print(usernames1)    
     return usernames1
+
+
 
 def get_info_usuario(usuario):
     doc_ref = db.collection("Users").document(usuario)

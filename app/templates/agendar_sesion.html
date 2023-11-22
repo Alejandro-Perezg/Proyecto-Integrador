@@ -149,6 +149,11 @@
             {% endfor %}
             </select>
         </div>
+        <div class="session-info">
+            <label>Roles Adicionales:</label>
+            <input id="informacion-adicional" type="text" placeholder="Información Adicional">
+            <button type="button" onclick="agregarInformacionAdicional()">Agregar Rol</button>
+        </div>
         <button type="submit">Agendar</button>
         <h3>{{mensaje}}</h3>
     </div>
@@ -159,6 +164,30 @@
     function goBack() {
         window.history.back();
     }
+
+    var contadorRol = 1; // Contador para mantener un seguimiento del número de campos agregados
+
+    function agregarInformacionAdicional() {
+        // Obtener el valor del input
+        var informacionAdicional = document.getElementById('informacion-adicional').value;
+
+        // Crear un nuevo elemento input oculto
+        var inputOculto = document.createElement('input');
+        inputOculto.type = 'hidden';
+        inputOculto.name = 'rol' + contadorRol; // Nombre dinámico del campo en el formulario
+        inputOculto.value = informacionAdicional;
+
+        // Incrementar el contador para el siguiente campo oculto
+        contadorRol++;
+
+        // Agregar el input oculto al formulario
+        document.querySelector('form').appendChild(inputOculto);
+
+        // Limpiar el valor del input después de agregarlo
+        document.getElementById('informacion-adicional').value = '';
+    }
+
+
 </script>
 
 </html>
