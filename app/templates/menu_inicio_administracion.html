@@ -17,6 +17,7 @@
         }
 
         .container {
+            position: relative;
             background-color: #fff;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
@@ -26,8 +27,20 @@
             text-align: center;
             margin: 20px;
         }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: red;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
         .header {
+            position: relative;
             background-color: #007BFF;
             color: #fff;
             padding: 20px;
@@ -74,6 +87,7 @@
 <body>
     <div class="container">
         <div class="header">
+            <button onclick="window.location.href='/'" class="back-button">Logout</button>
             <h1>Menú de Inicio</h1>
         </div>
         <div class="button-section">

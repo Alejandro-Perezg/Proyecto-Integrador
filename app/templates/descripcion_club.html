@@ -35,6 +35,17 @@
             padding: 20px;
             border-radius: 10px 10px 0 0;
         }
+        .back-button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #28a745;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
         h1 {
             margin: 0;
@@ -49,17 +60,6 @@
 
         .form-section label {
             font-weight: bold;
-        }
-        .back-button {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background-color: #28a745;
-            color: #fff;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
         }
 
         select, input {
@@ -92,35 +92,36 @@
 <body>
     <div class="container">
         <div class="header">
-            <button onclick="window.location.href='/'" class="back-button">Back</button>
-            <h1>Registro</h1>
+            <button onclick="window.location.href='/home/{{usuario}}/{{rol}}';" class="back-button">Back</button>
+            <h1>Añade una descripción o noticia</h1>
         </div>
-        <form action="/register" method="post">
+        <form action="/descripcion_club/{{usuario}}/{{club}}/{{rol}}" method="post">
             <div class="form-section">
-                <label>Usuario:</label>
-                <input type="text" id="username" name="username">
-            </div>
+                <label>Descripcion:</label>
+                <input type="hidden" id="valor" name="valor" value="1">
+                <input type="text" id="descripcion" name="descripcion">
             <div class="form-section">
-                <label>Contraseña:</label>
-                <input type="password" id="password" name="password">
-            </div>
-            <div class="form-section">
-                <label>Repetir Contraseña:</label>
-                <input type="password" id="confirm-password" name="repetirPassword">
-            </div>
-            <div class="form-section">
-                <label>Correo Electrónico:</label>
-                <input type="email" id="email" name="correoElectronico">
-            </div>
-            <div class="form-section">
-                <label>Fecha de Nacimiento:</label>
-                <input type="date" id="birthdate" name="fechaNacimiento">
-            </div>
-            <div class="form-section">
-                <button type="submit"  class="btn-register">Registrarse</button>
+                <button type="submit"  class="btn-register">Añadir Descripción</button>
             </div>
         </form>
+        <form action="/descripcion_club/{{usuario}}/{{club}}/{{rol}}" method="post">
+            <div class="form-section">
+                <label>Titulo:</label>
+                <input type="hidden" id="valor" name="valor" value="2">
+                <input type="text" id="titulo" name="titulo">
+                <label>Contenido:</label>
+                <input type="text" id="contenido" name="contenido">
+            <div class="form-section">
+                <button type="submit"  class="btn-register">Añadir noticia</button>
+            </div>
+        </form>
+        {% if message == "Tienes que agregar una descripción" %}
         <div style="color: red;">{{ message }}</div>
+        {% elif message == "Tienes que escribir el titulo y el contenido" %}
+            <div style="color: red;">{{ message }}</div>
+        {% else %}
+            <div style="color: green;">{{ message }}</div>
+        {% endif %}
     </div>
 </body>
 </html>

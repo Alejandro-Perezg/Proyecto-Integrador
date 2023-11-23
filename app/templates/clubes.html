@@ -109,18 +109,19 @@
             <button onclick="goBack()" class="back-button">Back</button> <!-- Añadido el botón "Back" -->
             <h1>Clubes</h1>
         </div>
+        {%for club in clubes%}
+        {% if club.descripcion == None%}
         <div class="club-section">
-            <h3>Shark Tank mini</h3>
-            <p>Adquiere los conocimientos necesarios para poder vender tu idea de negocio</p>
+            <h3>{{club.club}}</h3>
+            <p>Este club aún no tiene descripción</p>
         </div>
+        {% else %}
         <div class="club-section">
-            <h3>Small talk bootcamp</h3>
-            <p>Aprende cómo realizar conversaciones para conversaciones casuales</p>
+            <h3>{{club.club}}</h3>
+            <p>{{club.descripcion}}</p>
         </div>
-        <div class="club-section">
-            <h3>Caballeros de la dicción</h3>
-            <p>Encuentra todo lo necesario para poder expresarte como todo un conocedor del Blue Label de Johnnie Walker</p>
-        </div>
+        {% endif %}
+        {% endfor %}
         
     </div>
 </body>

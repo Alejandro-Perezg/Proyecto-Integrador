@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,6 +49,18 @@
             cursor: pointer;
         }
 
+        .description-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #28a745;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
         .user {
             display: flex;
             align-items: center;
@@ -74,17 +87,20 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <button onclick="goBack()" class="back-button">Back</button>
+        <button onclick="window.location.href='/home/{{usuario}}/{{rol}}';" class="back-button">Back</button>
+        <button class="description-button" onclick="window.location.href='/descripcion_club/{{usuario}}/{{club}}/{{rol}}';">Descripción</button>
         <h1>{{club}}</h1>
         <div class="club-name">Usuarios</div>
-        
-        {% for usuario in usuarios %}
+
+        {% for user in usuarios %}
             <div class="user">
-                <div class="user-name">{{usuario.username}}</div>
-                <form action="/club_admin/{{usuario.username}}/{{club}}" method="post">
+                <div class="user-name">{{user.username}}</div>
+                <form action='/club_admin/{{usuario}}/{{club}}/{{rol}}' method="post">
                     <input type="hidden" id="valor" name="valor" value="2">
+                    <input type="hidden" id="valor" name="usuario_eliminado" value="{{user.username}}">
                     <button type="submit" class="edit-icon">❌</i>
                 </form>
             </div>
@@ -93,12 +109,19 @@
             <p style="color: #28a745;">{{message}}</p>
         </div>
     </div>
-</body>
 
-<script>
-    function goBack() {
-        window.history.back();
-    }
-</script>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        function showDescription() {
+            // Agrega aquí el código para mostrar la descripción o realiza la acción deseada.
+            // Por ejemplo, podrías mostrar un mensaje de alerta o realizar alguna otra acción.
+            alert('Aquí va la descripción del club');
+        }
+    </script>
+
+</body>
 
 </html>

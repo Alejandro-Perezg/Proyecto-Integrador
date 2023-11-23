@@ -43,14 +43,14 @@ def home(usuario, rol):
     if 'username' in session:
         if rol == "socio":
             print(usuario, rol)
-            return render_template('menu_inicio_socio.html', usuario = usuario)
+            return render_template('menu_inicio_socio.html', usuario = usuario, rol = rol)
         elif rol == "administrador":
             usuario = usuario
             clubes = traer_clubes_admin(usuario)
-            return render_template('menu_inicio.html', usuario=usuario, clubes = clubes)
+            return render_template('menu_inicio.html', usuario=usuario, clubes = clubes, rol = rol)
         else:
             usuario = usuario
-            return render_template('menu_inicio_administracion.html', usuario=usuario)
+            return render_template('menu_inicio_administracion.html', usuario=usuario, rol = rol )
     else:
         return redirect(url_for('login'))
     
@@ -80,10 +80,11 @@ def participar_sesion(sesion, usuario):
         print(etapa)
         message = participar_en_sesion(sesion, usuario, etapa, rol)
         sesion_activa = get_sesion_activa(sesion)
+        roles = traer_roles_sesion(sesion)
         if sesion_activa == "Hubo un problema cargando la sesión":
             return render_template("participar_sesion_1.html", sesion = sesion_activa, message = sesion_activa, usuario = usuario)
         else:
-            return render_template("participar_sesion_1.html", sesion = sesion_activa, message = message, usuario = usuario)
+            return render_template("participar_sesion_1.html", sesion = sesion_activa, message = message, usuario = usuario, roles = roles)
 
     else:
         sesion_activa = get_sesion_activa(sesion)
@@ -91,6 +92,7 @@ def participar_sesion(sesion, usuario):
         segunda_etapa = get_participantes(sesion, "segunda_etapa")
         tercera_etapa = get_participantes(sesion, "tercera_etapa")
         cuarta_etapa = get_participantes(sesion, "cuarta_etapa")
+        roles = traer_roles_sesion(sesion)
         if sesion_activa == "Hubo un problema cargando la sesión":
             return render_template("participar_sesion_1.html", sesion = sesion_activa, message = sesion_activa, usuario = usuario)
         else:
@@ -100,7 +102,8 @@ def participar_sesion(sesion, usuario):
                                     primera_etapa = primera_etapa,
                                     segunda_etapa = segunda_etapa,
                                     tercera_etapa = tercera_etapa,
-                                    cuarta_etapa = cuarta_etapa)
+                                    cuarta_etapa = cuarta_etapa,
+                                    roles = roles)
         
 @app.route('/sesion_pasada/<string:sesion>/<string:usuario>', methods = ['GET', 'POST'])
 def sesion_pasada(sesion, usuario):
@@ -122,7 +125,8 @@ def sesion_pasada(sesion, usuario):
 
 @app.route('/clubes')
 def clubes():
-    return render_template("clubes.html")
+    clubes = get_descripciones_clubes()
+    return render_template("clubes.html", clubes = clubes)
 
 @app.route('/noticias')
 def noticias():
@@ -148,29 +152,59 @@ def club(club):
     print(usuarios)
     return render_template('info_club.html', usuarios = usuarios, club = club)
 
-@app.route('/club_admin/<string:usuario>/<string:club>', methods = ['GET', 'POST'])
-def club_admin(usuario, club):
+@app.route('/club_admin/<string:usuario>/<string:club>/<string:rol>', methods = ['GET', 'POST'])
+def club_admin(usuario, club, rol):
     if request.form.get("valor") == "1":
         usuarios = obtener_usuarios_de_club_admin(club)
         print(usuarios)
-        return render_template('info_club_admin.html', usuarios = usuarios, club = club, message = "")
+        return render_template('info_club_admin.html', usuarios = usuarios, club = club, message = "", usuario = usuario, rol = rol)
     else:
-        message = eliminar_usuario_de_club(usuario, club)
+        usuario_eliminado = request.form.get("usuario_eliminado")
+        message = eliminar_usuario_de_club(usuario_eliminado, club)
         usuarios = obtener_usuarios_de_club_admin(club)
-        return render_template('info_club_admin.html', usuarios = usuarios, club = club, message = message)
+        return render_template('info_club_admin.html', usuarios = usuarios, club = club, message = message, usuario = usuario, rol = rol)
+    
+
+@app.route('/descripcion_club/<string:usuario>/<string:club>/<string:rol>', methods = ['GET', 'POST'])
+def descripcion_club(usuario, club, rol):
+    if request.method == "POST":
+        if request.form.get("valor") == "1":
+            descripcion = request.form.get("descripcion")
+            if descripcion == "":
+                message = "Tienes que agregar una descripción"
+                return render_template('descripcion_club.html', usuario = usuario, club = club, rol = rol, message = message)
+            else:
+                message = agregar_actualizar_descripcion(club, descripcion)
+                return render_template('descripcion_club.html', usuario = usuario, club = club, rol = rol, message = message)
+        else:
+            titulo = request.form.get("titulo")
+            contenido = request.form.get("contenido")
+            if titulo == "" or contenido == "":
+                message = "Tienes que escribir el titulo y el contenido"
+                return render_template('descripcion_club.html', usuario = usuario, club = club, rol = rol, message = message)
+            else:
+                noticia = {
+                    "titulo": titulo,
+                    "contenido": contenido
+                }
+                message = agregar_noticia_a_club(club, noticia)
+                return render_template('descripcion_club.html', usuario = usuario, club = club, rol = rol, message = message)
+
+    return render_template('descripcion_club.html', usuario = usuario, club = club, rol = rol)
 
 
 
-@app.route('/usuarios_admin/<string:usuario>/<string:club>', methods = ['GET', 'POST'])
-def usuarios_admin(usuario, club):
+@app.route('/usuarios_admin/<string:usuario>/<string:club>/<string:rol>', methods = ['GET', 'POST'])
+def usuarios_admin(usuario, club, rol):
     if request.method == 'POST':
         if request.form.get("valor") == "1":
             usuarios = get_documentos("Users", "username")
-            return render_template("usuarios_admin.html", usuarios = usuarios, usuario = usuario, club = club, message = "")
+            return render_template("usuarios_admin.html", usuarios = usuarios, usuario = usuario, club = club, message = "", rol = rol)
         else:
             usuarios = get_documentos("Users", "username")
-            message = agregar_usuario_a_club(usuario, club)
-            return render_template("usuarios_admin.html", usuarios = usuarios, usuario = usuario, club = club, message = message)
+            usuario_agregado = request.form.get("usuario_agregado")
+            message = agregar_usuario_a_club(usuario_agregado, club)
+            return render_template("usuarios_admin.html", usuarios = usuarios, usuario = usuario, club = club, message = message, rol = rol)
 
 
 @app.route('/cambios_usuario/<string:usuario>', methods = ['GET', 'POST'])
@@ -651,6 +685,35 @@ def participar_en_sesion(sesion, usuario, etapa, rol):
         })
         return "Participación registrada"
 
+def traer_roles_sesion(sesion):
+    try:
+        # Referencia a la sesión específica
+        sesion_ref = db.collection("Sesiones").document(sesion)
+
+        # Obtiene el diccionario de roles para la sesión específica
+        sesion = sesion_ref.get()
+        if sesion.exists:
+            # Obtiene el diccionario de roles existentes
+            roles = sesion.to_dict().get("roles", {})
+            
+            # Obtiene la lista de roles extra
+            roles_extra = sesion.to_dict().get("roles_extra", [])
+            
+            # Combina los roles y roles_extra en una sola lista
+            roles.update(roles_extra)
+            
+            # Obtiene los nombres de los roles combinados
+            nombres_roles = list(roles.values())
+            
+            print(f"Nombres de roles en la sesión {sesion}: {nombres_roles}")
+            return nombres_roles
+        else:
+            print(f"No se encontró la sesión con ID {sesion}.")
+        
+    except:
+        return "Hubo un problema trayendo los roles"
+        
+
 def get_participantes(sesion, etapa):
     sesion_ref = db.collection("Sesiones").document(sesion)
 
@@ -668,6 +731,49 @@ def get_participantes(sesion, etapa):
     print(usernames1)    
     return usernames1
 
+def agregar_actualizar_descripcion(club, nueva_descripcion):
+    # Referencia al documento del club
+    club_ref = db.collection('Clubes').document(club)
+
+    # Si existe, actualiza la descripción
+    club_ref.update({'descripcion': nueva_descripcion})
+    return f'Descripción actualizada para el club con ID {club}'
+
+def agregar_noticia_a_club(club_id, nueva_noticia):
+    # Referencia al documento del club
+    club_ref = db.collection('Clubes').document(club_id)
+
+    # Obtiene el documento del club
+    club_doc = club_ref.get()
+
+    # Obtiene la lista actual de noticias del club o crea una lista vacía si no existe
+    noticias_actuales = club_doc.to_dict().get('noticias', [])
+
+    # Agrega la nueva noticia a la lista
+    noticias_actuales.append(nueva_noticia)
+
+    # Actualiza la lista de noticias en Firestore
+    club_ref.update({'noticias': noticias_actuales})
+    return f'Noticia agregada al club con ID {club_id}'
+
+def get_descripciones_clubes():
+    coleccion_clubes = 'Clubes'
+
+    # Realiza el query para obtener los IDs y descripciones de los clubes
+    clubes_ref = db.collection(coleccion_clubes)
+    clubes_docs = clubes_ref.stream()
+
+    # Crea una lista para almacenar los resultados
+    resultados = []
+
+    # Itera sobre los documentos y agrega los resultados a la lista
+    for club in clubes_docs:
+        id_club = club.id
+        descripcion = club.to_dict().get('descripcion', None)
+        resultados.append({'club': id_club, 'descripcion': descripcion})
+
+    # Imprime la lista de resultados
+    return resultados
 
 
 def get_info_usuario(usuario):

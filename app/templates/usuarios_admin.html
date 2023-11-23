@@ -82,15 +82,16 @@
 
 <body>
     <div class="container">
-        <button onclick="goBack()" class="back-button">Back</button>
+        <button onclick="window.location.href='/home/{{usuario}}/{{rol}}';" class="back-button">Back</button>
         <h1>Usuarios</h1>
         <div class="club-name">Usuarios</div>
 
-        {% for usuario in usuarios %}
+        {% for user in usuarios %}
         <div class="user">
-            <div class="user-name">{{usuario}}</div>
-            <form action="/usuarios_admin/{{usuario}}/{{club}}" method="post">
+            <div class="user-name">{{user}}</div>
+            <form action="/usuarios_admin/{{usuario}}/{{club}}/{{rol}}" method="post">
                 <input type="hidden" id="valor" name="valor" value="2">
+                <input type="hidden" id="valor" name="usuario_agregado" value="{{user}}">
                 <button type="submit" class="edit-icon" style="color: #28a745;">🟢+</button>
             </form>
         </div>

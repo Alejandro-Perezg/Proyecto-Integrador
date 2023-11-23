@@ -32,6 +32,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin-right: 10px; /* Ajusta el margen derecho según tus necesidades */
         }
 
         .tabs {
@@ -44,6 +45,14 @@
             flex: 1;
             padding: 10px;
             text-align: center;
+            cursor: pointer;
+        }
+        .back-button {
+            background-color: #28a745;
+            color: #fff;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
             cursor: pointer;
         }
 
@@ -93,6 +102,7 @@
 </head>
 <body>
     <div class="header">
+        <button onclick="goBack()" class="back-button">Back</button>
         <div class="title">Usuarios y Clubes</div>
         <button class="add-button">+</button>
     </div>
@@ -110,4 +120,11 @@
         <!-- Agrega más usuarios aquí -->
     </div>
 </body>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
+
 </html>
