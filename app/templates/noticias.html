@@ -102,14 +102,13 @@
             <button onclick="goBack()" class="back-button">Back</button>
             <h1>Noticias</h1>
         </div>
+        {% for noticia in noticias %}
         <div class="news-section">
-            <h2>Juan Picazo se une a nuestro club - 04 Oct</h2>
-            <p>Conoce a nuestro nuevo integrante experto en Alquimia</p>
+            <h2>{{noticia.titulo}}</h2>
+            <p>{{noticia.contenido}}</p>
+            <p>{{noticia.fecha}}</p>
         </div>
-        <div class="news-section">
-            <h2>Conoce nuestro nuevo club de entrenamiento de mascotas - 01 Oct</h2>
-            <p>Aprende cómo hacer que tu pezado aprenda a saltar en aros de fuego</p>
-        </div>
+        {% endfor %}
         <div class="button-section">
         </div>
     </div>

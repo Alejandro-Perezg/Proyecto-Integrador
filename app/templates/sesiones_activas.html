@@ -10,10 +10,6 @@
             background-color: #f2f2f2;
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
 
         .container {
@@ -22,8 +18,8 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
             padding: 20px;
-            width: 80%;
-            max-width: 400px;
+            max-width: 600px;
+            margin: 20px auto; /* Centra el contenedor en la página */
         }
 
         h1 {
@@ -36,8 +32,7 @@
             border-radius: 5px;
             padding: 10px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column; /* Cambiado a columna en pantallas más pequeñas */
         }
 
         .session-title {
@@ -55,12 +50,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                width: 90%;
-            }
+            margin-top: 10px; /* Añadido margen para mayor separación en pantallas pequeñas */
         }
 
         .back-button {
@@ -75,20 +65,16 @@
             cursor: pointer;
         }
 
-        @media (max-width: 480px) {
-            .session {
-                flex-direction: column;
-            }
-
-            .view-button {
-                margin-top: 10px;
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <button onclick="goBack()" class="back-button">Back</button> <!-- Añadido el botón "Back" -->
+        <button onclick="goBack()" class="back-button">Back</button>
         <h1>Sesiones</h1>
         {% for sesion in sesiones %}
         <div class="session">

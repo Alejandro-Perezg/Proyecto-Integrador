@@ -4,6 +4,7 @@ from datetime import datetime
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+from operator import itemgetter
 from google.cloud.firestore_v1.base_query import FieldFilter,Or, And
 
 cred = credentials.Certificate("serviceAccountKey.json")
@@ -56,13 +57,28 @@ def home(usuario, rol):
     
 @app.route('/sesiones_activas/<string:usuario>')
 def sesiones_activas(usuario):
-    sesiones_activas = traer_sesiones_activas(usuario)
-    return render_template("sesiones_activas.html", sesiones = sesiones_activas, usuario = usuario)
+    sin_club = verificar_si_el_usuario_tiene_club(usuario)
+    propietario = verificar_si_el_usuario_es_propietario(usuario)
+    if sin_club:
+        print("El usuario no tiene club")
+        sesiones = traer_sesiones()
+        return render_template("sesiones_activas_invitado.html", sesiones = sesiones, usuario = usuario)
+    else:
+        if propietario:
+            sesiones = traer_sesiones()
+            return render_template("sesiones_activas_invitado.html", sesiones = sesiones, usuario = usuario)
+        sesiones_activas = traer_sesiones_activas(usuario)
+        print("El usuario tiene club")
+        return render_template("sesiones_activas.html", sesiones = sesiones_activas, usuario = usuario)
 
 @app.route('/sesiones_pasadas/<string:usuario>')
 def sesiones_pasadas(usuario):
-    sesiones_activas = traer_sesiones_pasadas(usuario)
-    return render_template("sesiones_pasadas.html", sesiones = sesiones_activas, usuario = usuario)
+    if verificar_si_el_usuario_es_propietario(usuario):
+        sesiones_pasadas = traer_sesiones_pasadas_propietario()
+        return render_template("sesiones_pasadas.html", sesiones = sesiones_pasadas, usuario = usuario)
+    else:
+        sesiones_activas = traer_sesiones_pasadas(usuario)
+        return render_template("sesiones_pasadas.html", sesiones = sesiones_activas, usuario = usuario)
 
 
 
@@ -130,21 +146,23 @@ def clubes():
 
 @app.route('/noticias')
 def noticias():
-    return render_template("noticias.html")
+    noticias = obtener_noticias_de_todos_los_clubes()
+    print(noticias)
+    return render_template("noticias.html", noticias = noticias)
 
 @app.route('/aviso_de_privacidad')
 def aviso_de_privacidad():
     return render_template("aviso_privacidad.html")
   
-@app.route('/administracion')
-def administracion():
+@app.route('/administracion/<string:usuario>/<string:rol>')
+def administracion(usuario, rol):
     clubes = get_documentos("Clubes", "club")
-    return render_template('clubes_admin.html', clubes = clubes)
+    return render_template('clubes_admin.html', clubes = clubes, usuario = usuario, rol = rol)
 
-@app.route('/usuarios_administracion')
-def usuarios_administracion():
+@app.route('/usuarios_administracion/<string:usuario>/<string:rol>')
+def usuarios_administracion(usuario, rol):
     users = get_documentos("Users", "username")
-    return render_template('usuarios_club.html', users = users)
+    return render_template('usuarios_club.html', users = users, usuario = usuario, rol = rol)
 
 @app.route('/club/<string:club>')
 def club(club):
@@ -183,9 +201,11 @@ def descripcion_club(usuario, club, rol):
                 message = "Tienes que escribir el titulo y el contenido"
                 return render_template('descripcion_club.html', usuario = usuario, club = club, rol = rol, message = message)
             else:
+                fecha_formateada = datetime.now().strftime("%Y-%m-%d")
                 noticia = {
                     "titulo": titulo,
-                    "contenido": contenido
+                    "contenido": contenido,
+                    "fecha": fecha_formateada
                 }
                 message = agregar_noticia_a_club(club, noticia)
                 return render_template('descripcion_club.html', usuario = usuario, club = club, rol = rol, message = message)
@@ -286,8 +306,8 @@ def agendar_sesion(usuario):
  
 
 #Crear club
-@app.route('/crear_club', methods = ['GET', 'POST'])
-def crear_club():
+@app.route('/crear_club/<string:usuario>/<string:rol>', methods = ['GET', 'POST'])
+def crear_club(usuario, rol):
     if request.method == 'POST':
         club = request.form['nombre_club']
         admin = request.form['administradores']
@@ -296,23 +316,23 @@ def crear_club():
             message = "Tienes que ponerle un nombre al club"
             admins = get_admins("Users")
             usuarios = get_documentos("Users", "username")
-            return render_template("/crear_club.html", administradores = admins, usuarios = usuarios, message= message)
+            return render_template("/crear_club.html", administradores = admins, usuarios = usuarios, message= message, usuario= usuario, rol = rol)
         elif admin == "administrador":
             message = "Tienes que elegir un administrador"
             admins = get_admins("Users")
             usuarios = get_documentos("Users", "username")
-            return render_template("/crear_club.html", administradores = admins, usuarios = usuarios, message= message)     
+            return render_template("/crear_club.html", administradores = admins, usuarios = usuarios, message= message, usuario = usuario, rol = rol)     
         else:
             crear_club("Clubes", club, usuarios_club, admin)
             admins = get_admins("Users")
             usuarios = get_documentos("Users", "username")
             message = "El club se ha creado correctamente"
-            return render_template("crear_club.html", administradores = admins, usuarios = usuarios, message= message)
+            return render_template("crear_club.html", administradores = admins, usuarios = usuarios, message= message, usuario = usuario, rol = rol)
     else:
        admins = get_admins("Users")
        usuarios = get_documentos("Users", "username")
        message = ""
-       return render_template('crear_club.html', administradores = admins, usuarios = usuarios, message = message)
+       return render_template('crear_club.html', administradores = admins, usuarios = usuarios, message = message, usuario = usuario, rol = rol)
 
 
 
@@ -470,9 +490,9 @@ def borrar_usuario(user):
         doc_ref.delete()
     
 def cambios_usuario(user, club, rol):
-    user_ref = db.collection("Users").document(user)
-    user_ref.update({'club': "Sin club"})
     if club == "sacar_de_clubes":
+        user_ref = db.collection("Users").document(user)
+        user_ref.update({'club': "Sin club"})
         lista_clubes = get_documentos("Clubes", "club")
         for doc in lista_clubes:
             doc_ref = db.collection("Clubes").document(doc).collection("Users").document(user)
@@ -492,17 +512,42 @@ def agregar_usuario_a_club(user, club):
     try:
         doc_ref_club = db.collection("Clubes").document(club).collection("Users").document(user)
         doc_ref_club.set({'username':user})
+        user_ref = db.collection("Users").document(user)
+        user_ref.update({'club': club})
         return "Se añadio el usuario " + user + " al club " + club
     except:
         return "Hubo un problema añadiendo al usuario"
     
 def eliminar_usuario_de_club(user, club):
-    try:
-        doc_ref_club = db.collection("Clubes").document(club).collection("Users").document(user)
-        doc_ref_club.delete()
-        return "Se eliminó el usuario " + user + " del club " + club
-    except:
-        return "Hubo un problema eliminando al usuario"
+    doc_ref_club = db.collection("Clubes").document(club).collection("Users").document(user)
+    doc_ref_club.delete()
+    # Referencia a la colección "Clubes"
+    clubes_ref = db.collection('Clubes')
+
+    # Obtener todos los documentos de la colección "Clubes"
+    documentos_clubes = clubes_ref.stream()
+
+    # Variable para verificar si el usuario está en algún club
+    usuario_en_otro_club = False
+
+    # Verificar si el usuario está en alguna subcolección "Users" de algún club
+    for clup in documentos_clubes:
+        subcoleccion_users = clup.reference.collection('Users')
+        user_doc = subcoleccion_users.document(user).get()
+        
+        # Si el documento existe, el usuario aún está en otro club
+        if user_doc.exists:
+            usuario_en_otro_club = True
+            print("El usuario aún está en otro club.")
+            break
+
+    # Si no se encontró el usuario en ninguna subcolección "Users", imprimir el mensaje
+    if not usuario_en_otro_club:
+        user_ref = db.collection("Users").document(user)
+        user_ref.update({'club': "Sin club"})
+        print(f"El usuario con ID {user} no tiene club.")
+
+    return "Se eliminó el usuario" + user + " del club " + club
 
 
 
@@ -603,6 +648,24 @@ def traer_sesiones_pasadas(usuario):
         for sesion in query:
             sesiones.append(sesion.to_dict())
     print(sesiones)
+    return sesiones
+
+def traer_sesiones():
+    sesiones = []
+    fecha_actual = datetime.now()
+    filter_fecha = FieldFilter('fecha', '>', fecha_actual)
+    sesiones_ref = db.collection("Sesiones").where(filter = filter_fecha).get()
+    for sesion in sesiones_ref:
+        sesiones.append(sesion.to_dict())
+    return sesiones
+
+def traer_sesiones_pasadas_propietario():
+    sesiones = []
+    fecha_actual = datetime.now()
+    filter_fecha = FieldFilter('fecha', '<', fecha_actual)
+    sesiones_ref = db.collection("Sesiones").where(filter = filter_fecha).get()
+    for sesion in sesiones_ref:
+        sesiones.append(sesion.to_dict())
     return sesiones
 
 def get_sesion_activa(titulo):
@@ -780,6 +843,74 @@ def get_info_usuario(usuario):
     doc_ref = db.collection("Users").document(usuario)
     usuario = doc_ref.get().to_dict()
     return usuario
+
+def obtener_noticias_de_todos_los_clubes():
+    # Referencia a la colección de clubes
+    clubes_ref = db.collection('Clubes')
+
+    # Obtiene todos los documentos de la colección
+    clubes_docs = clubes_ref.stream()
+
+    # Diccionario para almacenar noticias de todos los clubes
+    noticias_list = [] 
+
+    # Itera sobre todos los clubes
+    for club_doc in clubes_docs:
+        # Obtiene el ID del club y la lista de noticias
+        club_id = club_doc.id
+        noticias_actuales = club_doc.to_dict().get('noticias', []) 
+        for noticia in noticias_actuales:
+            titulo = noticia.get('titulo', '')
+            contenido = noticia.get('contenido', '')
+            fecha = noticia.get('fecha', '')
+            noticias_list.append({'titulo': titulo, 'contenido': contenido, 'fecha': fecha})
+
+    # Ordena la lista de noticias por la fecha
+    noticias_ordenadas = sorted(noticias_list, key=lambda x: x['fecha'])
+
+    # Imprime las noticias ordenadas
+    print(noticias_ordenadas)
+
+    return noticias_ordenadas
+
+def verificar_si_el_usuario_tiene_club(user_id):
+
+    # Referencia al documento del usuario
+    user_ref = db.collection('Users').document(user_id)
+
+    # Obtiene el snapshot del documento
+    user_snapshot = user_ref.get()
+
+    # Verifica si el documento existe y si el atributo "club" es igual a "Sin Club"
+    if user_snapshot.exists:
+        user_data = user_snapshot.to_dict()
+        if user_data.get('club') == 'Sin club':
+            return True
+        else:
+            return False
+    else:
+        print(f"El usuario con ID {user_id} no existe.")
+        return False
+    
+
+def verificar_si_el_usuario_es_propietario(user_id):
+
+    # Referencia al documento del usuario
+    user_ref = db.collection('Users').document(user_id)
+
+    # Obtiene el snapshot del documento
+    user_snapshot = user_ref.get()
+
+    # Verifica si el documento existe y si el atributo "club" es igual a "Sin Club"
+    if user_snapshot.exists:
+        user_data = user_snapshot.to_dict()
+        if user_data.get('rol') == 'propietario':
+            return True
+        else:
+            return False
+    else:
+        print(f"El usuario con ID {user_id} no existe.")
+        return False
 
     
     

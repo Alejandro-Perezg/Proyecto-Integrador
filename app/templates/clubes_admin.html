@@ -103,11 +103,11 @@
     <body>
         <div class="header">
             <div class="title">Usuarios y Clubes</div>
-            <button onclick="goBack()" class="back-button">Back</button>
-            <button onclick="window.location.href='/crear_club';" class="add-button">+</button>
+            <button onclick="window.location.href='/home/{{usuario}}/{{rol}}';" class="back-button">Back</button>
+            <button onclick="window.location.href='/crear_club/{{usuario}}/{{rol}}';" class="add-button">+</button>
         </div>
         <div class="tabs">
-            <div onclick="window.location.href='/usuarios_administracion';" class="tab">Usuarios</div>
+            <div onclick="window.location.href='/usuarios_administracion/{{usuario}}/{{rol}}';" class="tab">Usuarios</div>
             <div class="tab active">Clubes</div>
         </div>
         <div class="user-list">

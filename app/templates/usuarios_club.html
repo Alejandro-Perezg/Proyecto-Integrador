@@ -102,13 +102,13 @@
 </head>
 <body>
     <div class="header">
-        <button onclick="goBack()" class="back-button">Back</button>
+        <button onclick="window.location.href='/home/{{usuario}}/{{rol}}';" class="back-button">Back</button>
         <div class="title">Usuarios y Clubes</div>
         <button class="add-button">+</button>
     </div>
     <div class="tabs">
         <div class="tab active">Usuarios</div>
-        <div onclick="window.location.href='/administracion';" class="tab">Clubes</div>
+        <div onclick="window.location.href='/administracion/{{usuario}}/{{rol}}';" class="tab">Clubes</div>
     </div>
     <div class="user-list">
         {% for user in users %}

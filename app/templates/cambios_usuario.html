@@ -91,7 +91,7 @@
 </head>
 <body>
     <div class="container">
-        <button onclick="window.location.href='/usuarios_administracion';" class="btn-back">Back</button> <!-- Nuevo botón de regreso -->
+        <button onclick="goBack()" class="btn-back">Back</button> <!-- Nuevo botón de regreso -->
         <div class="profile-pic">
             <img src="https://via.placeholder.com/150" alt="User">
         </div>
@@ -163,6 +163,10 @@
         }).catch(function(error) {
             console.error("Error:", error);
         });
+    }
+
+    function goBack() {
+        window.history.back();
     }
     </script>
 </html>

@@ -101,13 +101,13 @@
     <div class="container">
         <div class="header">
           <div class="btn-back-container">
-            <button onclick="window.location.href='/administracion';" class="btn-back">Back</button>
+            <button onclick="window.location.href='/administracion/{{usuario}}/{{rol}}';" class="btn-back">Back</button>
           </div>
             <h1>Crear un Club</h1>
         </div>
         <div class="user-selection">
         </div>
-        <form action="/crear_club" method="POST">
+        <form action="/crear_club/{{usuario}}/{{rol}}" method="POST">
           <div class="user-selection">
             <h4 style="color: #FF0000;">{{message}}</h1>
           </div>
@@ -155,5 +155,9 @@
           this.scrollTop = originalScrollTop; // Establecer el scroll de vuelta a su posición original
       });
   });
+
+  function goBack() {
+        window.history.back();
+    }
 </script>
 </html>
