@@ -111,15 +111,18 @@
             {% endfor %}
             </select>
         </div>
+        <div class="session-info">
+            <label>Toastmaster:</label>
+            <input name="toastmaster" placeholder="Toastmaster">
+        </div>
 
         <div class="session-info">
             <label>Número de Sesión:</label>
             <input name="numero" type="number" placeholder="Número de Sesión">
         </div>
-
         <div class="session-info">
-            <label>Acceso:</label>
-            <input  name ="acceso" type="text" placeholder="Acceso">
+            <label>Número de Proyectos:</label>
+            <input name="numero_proyectos" type="number" placeholder="Número de Proyectos">
         </div>
 
         <div class="session-info">
@@ -136,11 +139,6 @@
             <label>Definición y Ejemplo:</label>
             <input name="definicion_y_ejemplo" type="text" placeholder="Definición y Ejemplo">
         </div>
-
-        <div class="session-info">
-            <label>Invitación:</label>
-            <input name="invitacion" type="text" placeholder="Invitación">
-        </div>
         <div class="session-info">
             <label>Club:</label>
             <select id="club" name="club">
@@ -150,7 +148,7 @@
             </select>
         </div>
         <div class="session-info">
-            <label>Roles Adicionales:</label>
+            <label>Roles Adicionales Apertura:</label>
             <input id="informacion-adicional" type="text" placeholder="Información Adicional">
             <button type="button" onclick="agregarInformacionAdicional()">Agregar Rol</button>
         </div>

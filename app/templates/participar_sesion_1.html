@@ -164,7 +164,55 @@
                         <input type="hidden" id="etapaInput" name="etapa" value="">
                         <label for="etapaSelector">Selecciona tu opción:</label>
                         <select id="etapaSelector" name="rol">
-                            {% for rol in roles %}
+                            {% for rol in roles1 %}
+                                <option value="{{rol}}">{{rol}}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn-participate">Participar</button>
+                    </form>
+                </div>
+            </div>
+            <div id="participateModal2" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <h2 id="modalTitle2">Participar en Etapa</h2>
+                    <form action="/participar_sesion/{{sesion.titulo}}/{{usuario}}" method="post">
+                        <input type="hidden" id="etapaInput2" name="etapa" value="">
+                        <label for="etapaSelector">Selecciona tu opción:</label>
+                        <select id="etapaSelector" name="rol">
+                            {% for rol in roles2 %}
+                                <option value="{{rol}}">{{rol}}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn-participate">Participar</button>
+                    </form>
+                </div>
+            </div>
+            <div id="participateModal3" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <h2 id="modalTitle3">Participar en Etapa</h2>
+                    <form action="/participar_sesion/{{sesion.titulo}}/{{usuario}}" method="post">
+                        <input type="hidden" id="etapaInput3" name="etapa" value="">
+                        <label for="etapaSelector">Selecciona tu opción:</label>
+                        <select id="etapaSelector" name="rol">
+                            {% for rol in roles3 %}
+                                <option value="{{rol}}">{{rol}}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="btn-participate">Participar</button>
+                    </form>
+                </div>
+            </div>
+            <div id="participateModal4" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <h2 id="modalTitle4">Participar en Etapa</h2>
+                    <form action="/participar_sesion/{{sesion.titulo}}/{{usuario}}" method="post">
+                        <input type="hidden" id="etapaInput4" name="etapa" value="">
+                        <label for="etapaSelector">Selecciona tu opción:</label>
+                        <select id="etapaSelector" name="rol">
+                            {% for rol in roles4 %}
                                 <option value="{{rol}}">{{rol}}</option>
                             {% endfor %}
                         </select>
@@ -176,45 +224,43 @@
                 <p style="color: red;">{{message}}</p>
                 <label>Titulo de la Sesión:</label>
                 <p>{{sesion.titulo}}</p>
+                <label>Toastmaster:</label>
+                <p>{{sesion.toastmaster}}</p>
                 <label>Fecha:</label>
                 <p>{{sesion.fecha}}</p>
                 <label>Hora:</label>
                 <p>{{sesion.hora}}</p>
                 <label>Numero de Sesión:</label>
                 <p>{{sesion.numero}}</p>
-                <label>Acceso:</label>
-                <p>{{sesion.acceso}}</p>
-                <label>Tema de Sesión:</label>
+                <label>Temática de Sesión:</label>
                 <p>{{sesion.tema}}</p>
                 <label>Palabra de la Sesión:</label>
                 <p>{{sesion.palabra}}</p>
-                <label>Invitación:</label>
-                <p>{{sesion.invitacion}}</p>
                 <label>Club:</label>
                 <p>{{sesion.club}}</p>
 
                 <div class="participants-list">
-                    <label>Participantes Etapa 1:</label>
+                    <label>Participantes Apertura de la sesión:</label>
                     {% for participante in primera_etapa %}
                         <p>{{ participante.user.username }}, rol: {{ participante.user.rol }}</p>
                     {% endfor %}
                 </div>
     
                 <div class="participants-list">
-                    <label>Participantes Etapa 2:</label> 
+                    <label>Participantes TABLE TOPICS:</label> 
                     {% for participante in segunda_etapa %}
                         <p>{{ participante.user.username }}, rol: {{ participante.user.rol }}</p>
                     {% endfor %}
                 </div>
                 <div class="participants-list">
-                    <label>Participantes Etapa 3:</label>
+                    <label>Participantes Discursos Preparados:</label>
                     {% for participante in tercera_etapa %}
                         <p>{{ participante.user.username }}, rol: {{ participante.user.rol }}</p>
                     {% endfor %}
                 </div>
     
                 <div class="participants-list">
-                    <label>Participantes Etapa 4:</label> 
+                    <label>Participantes Evaluación General:</label> 
                     {% for participante in cuarta_etapa %}
                         <p>{{ participante.user.username }}, rol: {{ participante.user.rol }}</p>
                     {% endfor %}
@@ -223,17 +269,17 @@
 
             <div class="button-section">
                 <div class="button-container">
-                    <button type="button" onclick="openModal('primera')" class="btn-participate">Participar en Etapa 1</button>
+                    <button type="button" onclick="openModal('primera')" class="btn-participate">Participar en Apertura de Sesión</button>
                 </div>
                  
                 <div class="button-container">
-                    <button type="button" onclick="openModal('segunda')" class="btn-participate">Participar en Etapa 2</button>
+                    <button type="button" onclick="openModal2('segunda')" class="btn-participate">Participar en TABLE TOPICS</button>
                 </div>
                 <div class="button-container">
-                    <button type="button" onclick="openModal('tercera')" class="btn-participate">Participar en Etapa 3</button>
+                    <button type="button" onclick="openModal3('tercera')" class="btn-participate">Participar en Discursos Preparados</button>
                 </div>
                 <div class="button-container">
-                    <button type="button" onclick="openModal('cuarta')" class="btn-participate">Participar en Etapa 4</button>
+                    <button type="button" onclick="openModal4('cuarta')" class="btn-participate">Participar en Evaluación General</button>
                 </div>
             </div>
         {% endif %}
@@ -248,9 +294,27 @@
 
     // Función para abrir el modal
     function openModal(etapa) {
-        document.getElementById('modalTitle').innerText = 'Participar en la ' + etapa + 'etapa';
+        document.getElementById('modalTitle').innerText = 'Participar en Apertura de Sesión';
         document.getElementById('participateModal').style.display = 'flex';
         document.getElementById('etapaInput').value = etapa+ '_etapa';
+    }
+    // Función para abrir el modal
+    function openModal2(etapa) {
+        document.getElementById('modalTitle2').innerText = 'Participar en TABLE TOPICS®';
+        document.getElementById('participateModal2').style.display = 'flex';
+        document.getElementById('etapaInput2').value = etapa+ '_etapa';
+    }
+    // Función para abrir el modal
+    function openModal3(etapa) {
+        document.getElementById('modalTitle3').innerText = 'Participar en Discursos Preparados';
+        document.getElementById('participateModal3').style.display = 'flex';
+        document.getElementById('etapaInput3').value = etapa+ '_etapa';
+    }
+    // Función para abrir el modal
+    function openModal4(etapa) {
+        document.getElementById('modalTitle4').innerText = 'Participar en la Evaluación General';
+        document.getElementById('participateModal4').style.display = 'flex';
+        document.getElementById('etapaInput4').value = etapa+ '_etapa';
     }
 
     // Función para cerrar el modal

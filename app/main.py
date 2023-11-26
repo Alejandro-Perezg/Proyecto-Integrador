@@ -93,7 +93,6 @@ def participar_sesion(sesion, usuario):
     if request.method == "POST":
         etapa = request.form.get("etapa")
         rol = request.form.get("rol")
-        print(etapa)
         message = participar_en_sesion(sesion, usuario, etapa, rol)
         sesion_activa = get_sesion_activa(sesion)
         roles = traer_roles_sesion(sesion)
@@ -108,7 +107,11 @@ def participar_sesion(sesion, usuario):
         segunda_etapa = get_participantes(sesion, "segunda_etapa")
         tercera_etapa = get_participantes(sesion, "tercera_etapa")
         cuarta_etapa = get_participantes(sesion, "cuarta_etapa")
-        roles = traer_roles_sesion(sesion)
+        roles1 = traer_roles_sesion(sesion)
+        roles2 = traer_roles_sesion2(sesion)
+        roles3 = traer_roles_sesion3(sesion)
+        roles4 = traer_roles_sesion4(sesion)
+
         if sesion_activa == "Hubo un problema cargando la sesión":
             return render_template("participar_sesion_1.html", sesion = sesion_activa, message = sesion_activa, usuario = usuario)
         else:
@@ -119,7 +122,10 @@ def participar_sesion(sesion, usuario):
                                     segunda_etapa = segunda_etapa,
                                     tercera_etapa = tercera_etapa,
                                     cuarta_etapa = cuarta_etapa,
-                                    roles = roles)
+                                    roles1 = roles1,
+                                    roles2 = roles2,
+                                    roles3 = roles3,
+                                    roles4 = roles4)
         
 @app.route('/sesion_pasada/<string:sesion>/<string:usuario>', methods = ['GET', 'POST'])
 def sesion_pasada(sesion, usuario):
@@ -256,16 +262,21 @@ def agendar_sesion(usuario):
     if request.method == 'POST':
         titulo = request.form['titulo']
         fecha = request.form['fecha']
+        toastmaster = request.form['toastmaster']
+        numero_proyectos = request.form['numero_proyectos']
         fecha_datetime = datetime.strptime(fecha, "%Y-%m-%d")
         hora = request.form['hora']
-        acceso = request.form['acceso']
         tema = request.form['tema']
         palabra = request.form['palabra']
         definicion = request.form['definicion_y_ejemplo']
-        invitacion = request.form['invitacion']
         club = request.form['club']
         numero = request.form['numero']
         roles = {}
+        roles3 = {}
+
+        for rol in range(1, int(numero_proyectos) + 1):
+            roles3['rol1_proyecto' + str(rol)] = 'Introducción del Orador' + str(rol)
+            roles3['rol2_proyecto' + str(rol)] = 'Evaluación del Orador' + str(rol)
 
         for key, value in request.form.items():
             if key.startswith('rol'):
@@ -276,20 +287,23 @@ def agendar_sesion(usuario):
 
         data = {'username':usuario,
                 'titulo':titulo,
+                'toastmaster':toastmaster,
                 'fecha':fecha_datetime,
                 'hora':hora,
-                'acceso':acceso,
                 'tema':tema,
                 'palabra':palabra,
                 'numero': numero,
+                'numero_proyectos':  numero_proyectos,
                 'definicion':definicion,
-                'invitacion':invitacion,
                 'club': club,
                 "primera_etapa": [],
                 "segunda_etapa": [],
                 "tercera_etapa": [],
                 "cuarta_etapa": [],
-                "roles": {"rol1":"Rol1","Rol2":"Rol2", "Rol3":"Rol3","Rol4":"Rol4"},
+                "roles1": {"Rol1":"Apertura del Oficial de Asambleas","Rol2":"Bienvenida del Presidente y / o Representante", "Rol3":"Autopresentación de invitados y socios","Rol4":"Apertura del Toastmaster de la sesión", "Rol5": "Presentación del equipo de Evaluación", "Rol6": "Sección Educativa"},
+                "roles2":{"Rol1":"Introducción a la dinámica", "Rol2": "Sección de Table Topics®", "Rol3": "Evaluación de Table Topics®", "Rol4": "Concurso de Mejor Discurso de Table Topics®"},
+                "roles3":roles3,
+                "roles4": {"Rol1":"Introducción a la Dinámica","Rol2":"Introducción del Evaluador General", "Rol3":"Evaluación de Muletillas","Rol4":"Evaluación de Lenguaje Corporal", "Rol5": "Evaluación de Variedad Local", "Rol6": "Evaluación Gramatical", "Rol7": "Evaluación de Tiempo", "Rol8": "Evaluación General", "Rol9": "Concurso de Mejor Rol de la Sesión"},
                 "roles_extra": roles}
 
         mensaje = agendar(data)
@@ -738,9 +752,6 @@ def participar_en_sesion(sesion, usuario, etapa, rol):
         db = firestore.client()
         sesion_ref = db.collection("Sesiones").document(sesion)
 
-        # Verificar si el usuario ya está en alguna etapa
-        sesion_data = sesion_ref.get().to_dict()
-
 
         # Añade el usuario a la lista de la etapa correspondiente
         sesion_ref.update({
@@ -757,7 +768,7 @@ def traer_roles_sesion(sesion):
         sesion = sesion_ref.get()
         if sesion.exists:
             # Obtiene el diccionario de roles existentes
-            roles = sesion.to_dict().get("roles", {})
+            roles = sesion.to_dict().get("roles1", {})
             
             # Obtiene la lista de roles extra
             roles_extra = sesion.to_dict().get("roles_extra", [])
@@ -775,6 +786,96 @@ def traer_roles_sesion(sesion):
         
     except:
         return "Hubo un problema trayendo los roles"
+    
+
+def traer_roles_sesion2(sesion):
+    try:
+        # Referencia a la sesión específica
+        sesion_ref = db.collection("Sesiones").document(sesion)
+
+        # Obtiene el diccionario de roles para la sesión específica
+        sesion = sesion_ref.get()
+        if sesion.exists:
+            # Obtiene el diccionario de roles existentes
+            roles = sesion.to_dict().get("roles2", {})
+            
+            # Obtiene la lista de roles extra
+            roles_extra = sesion.to_dict().get("roles_extra", [])
+            
+            # Combina los roles y roles_extra en una sola lista
+            roles.update(roles_extra)
+            
+            # Obtiene los nombres de los roles combinados
+            nombres_roles = list(roles.values())
+            
+            print(f"Nombres de roles en la sesión {sesion}: {nombres_roles}")
+            return nombres_roles
+        else:
+            print(f"No se encontró la sesión con ID {sesion}.")
+        
+    except:
+        return "Hubo un problema trayendo los roles"
+    
+
+def traer_roles_sesion3(sesion):
+    try:
+        # Referencia a la sesión específica
+        sesion_ref = db.collection("Sesiones").document(sesion)
+
+        # Obtiene el diccionario de roles para la sesión específica
+        sesion = sesion_ref.get()
+        if sesion.exists:
+            # Obtiene el diccionario de roles existentes
+            roles = sesion.to_dict().get("roles3", {})
+            
+            # Obtiene la lista de roles extra
+            roles_extra = sesion.to_dict().get("roles_extra", [])
+            
+            # Combina los roles y roles_extra en una sola lista
+            roles.update(roles_extra)
+            
+            # Obtiene los nombres de los roles combinados
+            nombres_roles = list(roles.values())
+            
+            print(f"Nombres de roles en la sesión {sesion}: {nombres_roles}")
+            return nombres_roles
+        else:
+            print(f"No se encontró la sesión con ID {sesion}.")
+        
+    except:
+        return "Hubo un problema trayendo los roles"
+    
+
+def traer_roles_sesion4(sesion):
+    try:
+        # Referencia a la sesión específica
+        sesion_ref = db.collection("Sesiones").document(sesion)
+
+        # Obtiene el diccionario de roles para la sesión específica
+        sesion = sesion_ref.get()
+        if sesion.exists:
+            # Obtiene el diccionario de roles existentes
+            roles = sesion.to_dict().get("roles4", {})
+            
+            # Obtiene la lista de roles extra
+            roles_extra = sesion.to_dict().get("roles_extra", [])
+            
+            # Combina los roles y roles_extra en una sola lista
+            roles.update(roles_extra)
+            
+            # Obtiene los nombres de los roles combinados
+            nombres_roles = list(roles.values())
+            
+            print(f"Nombres de roles en la sesión {sesion}: {nombres_roles}")
+            return nombres_roles
+        else:
+            print(f"No se encontró la sesión con ID {sesion}.")
+        
+    except:
+        return "Hubo un problema trayendo los roles"
+    
+
+
         
 
 def get_participantes(sesion, etapa):
