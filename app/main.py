@@ -972,6 +972,12 @@ def obtener_noticias_de_todos_los_clubes():
     # Imprime las noticias ordenadas
     print(noticias_ordenadas)
 
+     # Invierte el orden de la lista
+    noticias_ordenadas.reverse()
+
+     # Imprime las noticias ordenadas
+    print(noticias_ordenadas)
+
     return noticias_ordenadas
 
 def verificar_si_el_usuario_tiene_club(user_id):
